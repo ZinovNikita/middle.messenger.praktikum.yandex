@@ -1,11 +1,22 @@
 {
   "name": "middle.messenger.praktikum.yandex",
   "version": "1.0.0",
+  "engines": {
+    "npm": "~8.19.2",
+    "node": "~16.17.1"
+  },
   "description": "---",
-  "main": "app.js",
+  "source": [
+    "src/pages/index.hbs",
+    "src/pages/signin.hbs",
+    "src/pages/signup.hbs",
+    "src/pages/404.hbs",
+    "src/pages/500.hbs"
+  ],
   "scripts": {
-    "dev": "parcel -p 3000 --no-cache ./src/pages/**/*.hbs",
-    "production": "node ./app.js"
+    "dev": "parcel -p 3000 --no-cache --no-source-maps",
+    "build": "parcel build",
+    "start": "node ./app.js"
   },
   "repository": {
     "type": "git",

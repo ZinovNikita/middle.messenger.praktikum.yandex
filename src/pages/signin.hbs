@@ -1,0 +1,34 @@
+---
+sitename: Мессенджер
+title: Вход
+fields:
+  - label: Логин
+    type: text
+    name: login
+  - label: Пароль
+    type: password
+    name: password
+---
+{{>header}}
+<main>
+    <div class="dark">
+        <div class="modal">
+            <h1 class="modal-title">{{title}}</h1>
+            <form id="signin-form">
+            {{#fields}}
+                <label>{{label}}</label>
+                <input type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
+            {{/fields}}
+                <input type="submit" value="Войти"/>
+                <a class="text-center" href="./signup.hbs">Регистрация</a>
+            </form>
+        </div>
+    </div>
+</main>
+<script>
+document.querySelector('#signin-form').addEventListener('submit',function(event){
+    event.preventDefault();
+    location.href = '/messager.html'
+})
+</script>
+{{>footer}}

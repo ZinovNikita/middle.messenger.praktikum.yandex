@@ -17,6 +17,12 @@ $placeholder-color: #dddddd;
     display: flex;
     flex-flow: row nowrap;
     align-content: flex-start;
+    .chat-image{
+        height: 50px;
+        margin: 10px;
+        width: auto;
+        border-radius: 50%;
+    }
     >.sidebar{
         background-color: $sidebar-bg;
         min-width: 400px;
@@ -47,12 +53,6 @@ $placeholder-color: #dddddd;
                 border-bottom: $default-border;
                 &.active{
                     background-color: $main-bg;
-                }
-                >.chat-image{
-                    height: 50px;
-                    margin: 10px;
-                    width: auto;
-                    border-radius: 50%;
                 }
                 >.chat-text{
                     display: flex;
