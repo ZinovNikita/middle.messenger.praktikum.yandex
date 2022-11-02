@@ -1,0 +1,38 @@
+/*Модальное окно*/
+.dark{
+    background-color: rgba(255, 255, 255, 0.5);
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    >.modal{
+        background-color: $sidebar-bg;
+        position: relative;
+        top:10vh;
+        border-radius: 5px;
+        padding: 10px;
+        left: calc(50vw - 300px);
+        width: 600px;
+        >.modal-title{
+            border-bottom: $default-border;
+            padding: 10px;
+            padding-top: 5px;
+            margin-bottom: 10px;
+        }
+        &.small{
+            left: calc(50vw - 200px);
+            width: 400px;
+        }
+        &.medium{
+            left: calc(50vw - 300px);
+            width: 600px;
+        }
+        &.big{
+            left: calc(50vw - 500px);
+            width: 1000px;
+        }
+    }
+}

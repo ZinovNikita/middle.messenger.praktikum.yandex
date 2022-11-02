@@ -1,0 +1,146 @@
+$main-bg: #0e0e10;
+$main-color: #ffffff;
+$sidebar-bg: #1f1f23;
+$link-color: #bf94ff;
+$btn-bg: #0000ff;
+$default-border: 1px solid #848484;
+$input-bg: #848484;
+$placeholder-color: #dddddd;
+@import 'reset';
+@import 'error';
+@import 'modal';
+/*Стиль основной страницы*/
+.container{
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: flex-start;
+    >.sidebar{
+        background-color: $sidebar-bg;
+        min-width: 400px;
+        max-width: 400px;
+        width: 400px;
+        height: 100%;
+        border-right: $default-border;
+        >.search-box{
+            height: 50px;
+            border-bottom: $default-border;
+            padding:10px 5px;
+            >.profile {
+                max-width:80px;
+                margin-left: 0;
+            }
+        }
+        >.chat-list{
+            height: calc(100vh - 71px);
+            overflow-y: scroll;
+            overflow-x: hidden;
+            display: flex;
+            flex-flow: column nowrap;
+            align-content: flex-start;
+            >.chat-item {
+                display: flex;
+                align-content: flex-start;
+                height: 70px;
+                border-bottom: $default-border;
+                &.active{
+                    background-color: $main-bg;
+                }
+                >.chat-image{
+                    height: 50px;
+                    margin: 10px;
+                    width: auto;
+                    border-radius: 50%;
+                }
+                >.chat-text{
+                    display: flex;
+                    flex-flow: column nowrap;
+                    align-content: flex-start;
+                    >.chat-title{
+                        margin: 10px 0;
+                    }
+                }
+            }
+        }
+    }
+    >.main{
+        display: flex;
+        flex-flow: column nowrap;
+        align-content: flex-start;
+        width: calc(100% - 400px);
+        >.chat-header {
+            flex: 1 1 auto;
+            align-self: stretch;
+            background-color: $sidebar-bg;
+            max-height: 70px;
+            display: flex;
+            justify-content: space-between;
+            >*{
+                display: block;
+                align-self: center;
+                margin: 10px;
+            }
+        }
+        >.chat-input-box{
+            margin:20px;
+            max-height: 100px;
+            >input[type=submit]{
+                max-width:100px;
+            }
+        }
+        >.chat-messages{
+            flex: 1 1 auto;
+            align-self: stretch;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: flex-end;
+            >.message-block{
+                display: flex;
+                flex-flow: row nowrap;
+                >.message-item{
+                    max-width: 80%;
+                    background-color: $sidebar-bg;
+                    padding: 10px;
+                    margin:10px;
+                    >.message-title{
+                        margin-bottom: 5px;
+                        display: block;
+                    }
+                    >.message-images{
+                        display: flex;
+                        margin-bottom: 5px;
+                        flex-flow: row wrap;
+                        >img{
+                            display: block;
+                            max-height: 200px;
+                            max-width: 200px;
+                            flex: 1 1 200px;
+                            margin:2px
+                        }
+                    }
+                    >.message-time{
+                        text-align: right;
+                        margin-top: 5px;
+                        display: block;
+                    }
+                }
+                &.right{
+                    justify-content:flex-end;
+                    >.message-item{
+                        border-radius: 5px 5px 0 5px;
+                    }
+                }
+                &.left{
+                    justify-content:flex-start;
+                    >.message-item{
+                        border-radius: 5px 5px 5px 0;
+                    }
+                }
+            }
+        }
+    }
+}
