@@ -16,6 +16,8 @@
         padding: 10px;
         left: calc(50vw - 300px);
         width: 600px;
+        overflow-x: hidden;
+        overflow-y: auto;
         >.modal-title{
             border-bottom: $default-border;
             padding: 10px;

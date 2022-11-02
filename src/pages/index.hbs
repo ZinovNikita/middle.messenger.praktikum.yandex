@@ -1,64 +1,69 @@
 ---
-sitename: Мессенджер
 title: Чаты
+profile_fields:
+  - type: file
+    name: avatar
+  - label: Имя
+    type: text
+    name: first_name
+    value: Никита
+    show: true
+  - label: Фамилия
+    type: text
+    name: second_name
+    value: Зинов
+    show: true
+  - label: Логин
+    type: text
+    name: login
+    value: ZinovNA
+    show: true
+  - label: Email
+    type: text
+    name: email
+    value: email@yandex.ru
+    show: true
+  - label: Телефон
+    type: text
+    name: phone
+    value: "+79876543210"
+    show: true
+  - label: Старый пароль
+    type: password
+    name: oldPassword
+  - label: Новый пароль
+    type: password
+    name: newPassword
+  - label: Подтвердите пароль
+    type: password
+    name: newPassword2
 ---
 {{>header}}
 <main>
     <div class="container">
-    <div class="sidebar">
-        <form class="search-box inline">
-            <input type="text" class="search-input" placeholder="Поиск" style="width:68%"/>
-            <button class="profile">Профиль</button>
-        </form>
-        <div class="chat-list">
-            <div class="chat-item active">
-                <img class="chat-image" src="https://thispersondoesnotexist.com/image"/>
-                <div class="chat-text">
-                    <b class="chat-title">Иванов Иван</b>
-                    <span class="mutted">Привет! Я приехал!</span>
-                </div>
-            </div>
-        </div>
+        {{>sidebar}}
+        {{>chat}}
     </div>
-    <div class="main">
-        <div class="chat-header">
-            <b style="display: flex;">
-                <img class="chat-image" src="https://thispersondoesnotexist.com/image"/>
-                <span style="align-self: center;">Иванов Иван</span>
-            </b>
-            <h1 style="width: 50px;height:50px;line-height: 50px;text-align: center;">&#8801;</h1>
-        </div>
-        <div class="chat-messages">
-            <div class="message-block left">
-                <div class="message-item">
-                    <b class="message-title">Иванов Иван</b>
-                    <div class="message-images">
-                        <img src="https://thispersondoesnotexist.com/image"/>
-                        <img src="https://thispersondoesnotexist.com/image"/>
-                        <img src="https://thispersondoesnotexist.com/image"/>
-                        <img src="https://thispersondoesnotexist.com/image"/>
-                        <img src="https://thispersondoesnotexist.com/image"/>
-                    </div>
-                    <div class="message-body">
-    Привет! Смотри, тут всплыл интересный кусок лунной космической истории — НАСА в какой-то момент попросила Хассельблад адаптировать модель SWC для полетов на Луну. Сейчас мы все знаем что астронавты летали с моделью 500 EL — и к слову говоря, все тушки этих камер все еще находятся на поверхности Луны, так как астронавты с собой забрали только кассеты с пленкой.
-    <br>Хассельблад в итоге адаптировал SWC для космоса, но что-то пошло не так и на ракету они так никогда и не попали. Всего их было произведено 25 штук, одну из них недавно продали на аукционе за 45000 евро.
-                    </div>
-                    <small class="message-time">10:20</small>
-                </div>
-            </div>
-            <div class="message-block right">
-                <div class="message-item">
-                    <b class="message-title">Зинов Никита</b>
-                    <div class="message-body">Хорошо</div>
-                    <small class="message-time">11:20</small>
-                </div>
-            </div>
-        </div>
-        <form class="chat-input-box inline">
-            <textarea placeholder="Сообщение"></textarea>
-            <input type="submit" value="Отправить"/>
-        </form>
-    </div>
-</div>
 </main>
+<div class="dark hidden">
+{{>profile prefix="profileInfo" readonly=true}}
+{{>profile prefix="profileEdit" readonly=false}}
+</div>
+<script>
+document.querySelector('.dark').addEventListener('click',function(event){
+    event.preventDefault();
+    event.target.classList.add('hidden');
+    event.target.querySelector('.modal').classList.add('hidden');
+})
+document.querySelector('#profile-edit-btn').addEventListener('click',function(event){
+    event.preventDefault();
+    document.querySelector('.dark.hidden').classList.remove('hidden');
+    document.querySelector('#profileEdit').classList.remove('hidden');
+})
+document.querySelector('#profile-info-btn').addEventListener('click',function(event){
+    event.preventDefault();
+    document.querySelector('.dark.hidden').classList.remove('hidden');
+    document.querySelector('#profileInfo').classList.remove('hidden');
+})
+</script>
 {{>footer}}
