@@ -34,8 +34,8 @@
     "hbs": "~4.2.0"
   },
   "devDependencies": {
-    "@anikin/parcel-transformer-handlebars": "~1.0.9",
-    "@parcel/transformer-sass": "~2.7.0",
-    "parcel": "~2.7.0"
+    "@anikin/parcel-transformer-handlebars": "^1.0.2",
+    "@parcel/transformer-sass": "^2.7.0",
+    "parcel": "^2.7.0"
   }
 }
