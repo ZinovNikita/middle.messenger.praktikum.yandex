@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "parcel -p 3000 --no-cache --no-source-maps",
     "build": "parcel build",
-    "start": "node ./app.js"
+    "start": "parcel build && node ./app.js"
   },
   "repository": {
     "type": "git",
