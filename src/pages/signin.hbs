@@ -10,28 +10,26 @@ fields:
 ---
 {{>header}}
 <main>
-    <div class="dark">
-        <dialog open class="modal">
-            <header class="modal-title">
-                <h3>{{title}}</h3>
-            </header>
-            <form id="signin-form">
-            {{#fields}}
-                <label>{{label}}</label>
-                <input type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
-            {{/fields}}
-            </form>
-            <footer class="modal-footer">
-                <a class="text-center" aria-label="Страница регистрации" href="./signup.hbs">Регистрация</a>
-                <button onclick="submitForm(event)">Войти</button>
-            </footer>
-        </dialog>
-    </div>
+    <dialog open class="modal">
+        <header class="modal-title">
+            <h3>{{title}}</h3>
+        </header>
+        <form id="signin-form">
+        {{#fields}}
+            <label>{{label}}</label>
+            <input type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
+        {{/fields}}
+        </form>
+        <footer class="modal-footer">
+            <a class="text-center" aria-label="Страница регистрации" href="./signup.hbs">Регистрация</a>
+            <button id="submit-form-btn">Войти</button>
+        </footer>
+    </dialog>
 </main>
 <script>
-function submitForm(event){
-  document.querySelector('#signin-form').dispatchEvent(new SubmitEvent('submit', { submitter: event.target }))
-}
+document.querySelector('#submit-form-btn').addEventListener('click',(event)=>{
+    document.querySelector('#signin-form').dispatchEvent(new SubmitEvent('submit', { submitter: event.target }))
+})
 document.querySelector('#signin-form').addEventListener('submit',function(event){
     event.preventDefault();
     location.href = '/chats.html'
