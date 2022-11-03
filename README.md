@@ -8,9 +8,10 @@
 
 Проект представляет собой один из многих мессенджеров. Использует express, handlebars, parcel для сборки
 
-## Страницы проекта
-- [Список чатов](http://localhost:3000/index.html) — отображается список чатов и в каждом из них список сообщений
-- [Авторизация](http://localhost:3000/signin.html) — Вход для существующих пользователей
-- [Регистрация](http://localhost:3000/signup.html) — Регистрация новых пользователей
-- [404 Ошибка](http://localhost:3000/404.html) — Ошибка 404
-- [5** Ошибка](http://localhost:3000/500.html) — Ошибка 5**
+## Страницы проекта на Netlify
+- [Главная страница](https://elaborate-paprenjak-e0ca12.netlify.app/index.html) — отображаются ссылки на все страницы
+- [Список чатов](https://elaborate-paprenjak-e0ca12.netlify.app/chats.html) — отображается список чатов и в каждом из них список сообщений
+- [Авторизация](https://elaborate-paprenjak-e0ca12.netlify.app/signin.html) — Вход для существующих пользователей
+- [Регистрация](https://elaborate-paprenjak-e0ca12.netlify.app/signup.html) — Регистрация новых пользователей
+- [404 Ошибка](https://elaborate-paprenjak-e0ca12.netlify.app/404.html) — Ошибка 404
+- [5** Ошибка](https://elaborate-paprenjak-e0ca12.netlify.app/500.html) — Ошибка 5**
