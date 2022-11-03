@@ -11,10 +11,10 @@ fields:
     type: text
     name: login
   - label: Email
-    type: text
+    type: email
     name: email
   - label: Телефон
-    type: text
+    type: tel
     name: phone
   - label: Пароль
     type: password
@@ -26,23 +26,30 @@ fields:
 {{>header}}
 <main>
     <div class="dark">
-        <div class="modal">
-            <h1 class="modal-title">{{title}}</h1>
-            <form id="signup-form">
+        <dialog open class="modal">
+            <header class="modal-title">
+                <h3>{{title}}</h3>
+            </header>
+            <form id="signup-form" method="dialog">
             {{#fields}}
                 <label>{{label}}</label>
                 <input type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
             {{/fields}}
-                <input type="submit" value="Зарегистрироваться"/>
-                <a class="text-center" href="./signin.hbs">Войти</a>
             </form>
-        </div>
+            <footer class="modal-footer">
+                <a class="text-center" aria-label="Страница входа" href="./signin.hbs">Войти</a>
+                <button onclick="submitForm(event)">Зарегистрироваться</button>
+            </footer>
+        </dialog>
     </div>
 </main>
 <script>
+function submitForm(event){
+  document.querySelector('#signup-form').dispatchEvent(new SubmitEvent('submit', { submitter: event.target }))
+}
 document.querySelector('#signup-form').addEventListener('submit',function(event){
     event.preventDefault();
-    location.href = '/messager.html'
+    location.href = '/chats.html';
 })
 </script>
 {{>footer}}

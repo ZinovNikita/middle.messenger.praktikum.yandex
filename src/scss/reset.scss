@@ -35,17 +35,17 @@ a{
 textarea,input,button,label,a{
     font-size: 14px;
 }
-button,input[type=submit],input[type=button],input[type=cancel]{
+button,input[type=submit],input[type=button],input[type=reset]{
     border-radius: 5px;
     border: $default-border;
     padding: 6px 8px;
     background-color: $btn-bg;
     text-align: center;
 }
-input[type=cancel]{
+input[type=reset]{
     background-color: red;
 }
-textarea,input[type=text],input[type=password],input[type=number]{
+textarea,input[type=text],input[type=password],input[type=number],input[type=email],input[type=tel]{
     border-radius: 5px;
     border: $default-border;
     padding: 6px 8px;
@@ -76,6 +76,14 @@ form{
     input[type=file]{
         display: none;
     }
+    fieldset{
+        border: none;
+        display: flex;
+        flex-flow: column nowrap;
+        label{
+            margin-bottom: 4px;
+        }
+    }
     &.inline{
         flex-flow: row wrap;
         justify-content:space-around;
@@ -86,6 +94,7 @@ form{
     }
     .show-field{
         display: flex;
+        flex-flow: row nowrap;
         justify-content: space-between;
         margin:10px;
         >.show-item{

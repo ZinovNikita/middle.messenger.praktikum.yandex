@@ -1,13 +1,13 @@
-<div class="main">
-    <div class="chat-header">
-        <a id="profile-info-btn" style="display:flex;">
-            <img class="chat-image" src="https://thispersondoesnotexist.com/image"/>
+<div class="chat-box">
+    <header class="chat-header">
+        <a aria-label="Информация о собеседнике" id="profile-info-btn" style="display:flex;">
+            <img alt="Аватар собеседника" class="chat-image" src="https://thispersondoesnotexist.com/image"/>
             <b style="align-self: center;font-size:18px">Иванов Иван</b>
         </a>
         <h1 style="width: 50px;height:50px;line-height: 50px;text-align: center;">&#8801;</h1>
-    </div>
-    <div class="chat-messages">
-        <div class="message-block left">
+    </header>
+    <main class="chat-messages">
+        <article class="message-block left">
             <div class="message-item">
                 <b class="message-title">Иванов Иван</b>
                 <div class="message-images">
@@ -23,17 +23,19 @@
                 </div>
                 <small class="message-time">10:20</small>
             </div>
-        </div>
-        <div class="message-block right">
+        </article>
+        <article class="message-block right">
             <div class="message-item">
                 <b class="message-title">Зинов Никита</b>
-                <div class="message-body">Хорошо</div>
+                <div class="message-body">Хорошо, посмотрю</div>
                 <small class="message-time">11:20</small>
             </div>
-        </div>
-    </div>
-    <form class="chat-input-box inline">
-        <textarea placeholder="Сообщение"></textarea>
-        <input type="submit" value="Отправить"/>
-    </form>
+        </article>
+    </main>
+    <footer class="chat-input-box">
+        <form class="inline">
+            <textarea placeholder="Сообщение"></textarea>
+            <input type="submit" value="Отправить"/>
+        </form>
+    </footer>
 </div>

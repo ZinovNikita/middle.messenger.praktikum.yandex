@@ -1,0 +1,65 @@
+---
+title: Чаты
+profile_fields:
+  - type: image
+    name: avatar
+  - label: Имя
+    type: text
+    name: first_name
+    value: Никита
+    show: true
+  - label: Фамилия
+    type: text
+    name: second_name
+    value: Зинов
+    show: true
+  - label: Логин
+    type: text
+    name: login
+    value: ZinovNA
+    show: true
+  - label: Email
+    type: email
+    name: email
+    value: email@yandex.ru
+    show: true
+  - label: Телефон
+    type: tel
+    name: phone
+    value: "+79876543210"
+    show: true
+  - label: Старый пароль
+    type: password
+    name: oldPassword
+  - label: Новый пароль
+    type: password
+    name: newPassword
+  - label: Подтвердите пароль
+    type: password
+    name: newPassword2
+---
+{{>header}}
+<main>
+    <div class="container">
+        {{>sidebar}}
+        {{>chat}}
+    </div>
+</main>
+{{>profile prefix="profileInfo" readonly=true}}
+{{>profile prefix="profileEdit" readonly=false}}
+<script>
+function closeDialog(event){
+    if(event.target.classList.contains('modal-close')){
+        event.target.parentNode.parentNode.close();
+    }
+}
+document.querySelector('#profile-edit-btn').addEventListener('click',function(event){
+    event.preventDefault();
+    document.querySelector('#profileEdit').showModal();
+})
+document.querySelector('#profile-info-btn').addEventListener('click',function(event){
+    event.preventDefault();
+    document.querySelector('#profileInfo').showModal();
+})
+</script>
+{{>footer}}
