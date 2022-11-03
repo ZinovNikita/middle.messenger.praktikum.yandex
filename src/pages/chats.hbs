@@ -48,11 +48,13 @@ profile_fields:
 {{>profile prefix="profileInfo" readonly=true}}
 {{>profile prefix="profileEdit" readonly=false}}
 <script>
-function closeDialog(event){
-    if(event.target.classList.contains('modal-close')){
-        event.target.parentNode.parentNode.close();
-    }
-}
+document.querySelectorAll('.modal-close').forEach(el=>{
+    el.addEventListener('click',(event)=>{
+        if(event.target.classList.contains('modal-close')){
+            event.target.parentNode.parentNode.close();
+        }
+    })
+})
 document.querySelector('#profile-edit-btn').addEventListener('click',function(event){
     event.preventDefault();
     document.querySelector('#profileEdit').showModal();
