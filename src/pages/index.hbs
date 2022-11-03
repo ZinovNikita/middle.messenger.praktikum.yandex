@@ -1,69 +1,17 @@
 ---
-title: Чаты
-profile_fields:
-  - type: file
-    name: avatar
-  - label: Имя
-    type: text
-    name: first_name
-    value: Никита
-    show: true
-  - label: Фамилия
-    type: text
-    name: second_name
-    value: Зинов
-    show: true
-  - label: Логин
-    type: text
-    name: login
-    value: ZinovNA
-    show: true
-  - label: Email
-    type: text
-    name: email
-    value: email@yandex.ru
-    show: true
-  - label: Телефон
-    type: text
-    name: phone
-    value: "+79876543210"
-    show: true
-  - label: Старый пароль
-    type: password
-    name: oldPassword
-  - label: Новый пароль
-    type: password
-    name: newPassword
-  - label: Подтвердите пароль
-    type: password
-    name: newPassword2
+title: Список страниц
 ---
 {{>header}}
 <main>
-    <div class="container">
-        {{>sidebar}}
-        {{>chat}}
-    </div>
+    <nav class="index-menu">
+        <h1>Список страниц сайта</h1>
+        <ul>
+            <li><a aria-label="Страница регистрации" href="./signup.hbs">Страница регистрации</a></li>
+            <li><a aria-label="Страница входа" href="./signin.hbs">Страница входа</a></li>
+            <li><a aria-label="Список чатов" href="./chats.hbs">Список чатов</a></li>
+            <li><a aria-label="Страница ошибок 404" href="./404.hbs">Страница ошибок 404</a></li>
+            <li><a aria-label="Страница ошибок 5**" href="./500.hbs">Страница ошибок 5**</a></li>
+        </ul>
+    </nav>
 </main>
-<div class="dark hidden">
-{{>profile prefix="profileInfo" readonly=true}}
-{{>profile prefix="profileEdit" readonly=false}}
-</div>
-<script>
-document.querySelector('.dark').addEventListener('click',function(event){
-    event.preventDefault();
-    event.target.classList.add('hidden');
-    event.target.querySelector('.modal').classList.add('hidden');
-})
-document.querySelector('#profile-edit-btn').addEventListener('click',function(event){
-    event.preventDefault();
-    document.querySelector('.dark.hidden').classList.remove('hidden');
-    document.querySelector('#profileEdit').classList.remove('hidden');
-})
-document.querySelector('#profile-info-btn').addEventListener('click',function(event){
-    event.preventDefault();
-    document.querySelector('.dark.hidden').classList.remove('hidden');
-    document.querySelector('#profileInfo').classList.remove('hidden');
-})
-</script>
 {{>footer}}

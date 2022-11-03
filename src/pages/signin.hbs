@@ -11,23 +11,30 @@ fields:
 {{>header}}
 <main>
     <div class="dark">
-        <div class="modal">
-            <h1 class="modal-title">{{title}}</h1>
+        <dialog open class="modal">
+            <header class="modal-title">
+                <h3>{{title}}</h3>
+            </header>
             <form id="signin-form">
             {{#fields}}
                 <label>{{label}}</label>
                 <input type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
             {{/fields}}
-                <input type="submit" value="Войти"/>
-                <a class="text-center" href="./signup.hbs">Регистрация</a>
             </form>
-        </div>
+            <footer class="modal-footer">
+                <a class="text-center" aria-label="Страница регистрации" href="./signup.hbs">Регистрация</a>
+                <button onclick="submitForm(event)">Войти</button>
+            </footer>
+        </dialog>
     </div>
 </main>
 <script>
+function submitForm(event){
+  document.querySelector('#signin-form').dispatchEvent(new SubmitEvent('submit', { submitter: event.target }))
+}
 document.querySelector('#signin-form').addEventListener('submit',function(event){
     event.preventDefault();
-    location.href = '/messager.html'
+    location.href = '/chats.html'
 })
 </script>
 {{>footer}}
