@@ -1,0 +1,105 @@
+/*Сброс стиля*/
+* {
+    margin:0;
+    padding:0;
+    font-family:sans-serif;
+    color:$main-color;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0.1);
+    &::-webkit-scrollbar {
+        width: 10px;
+        width: 10px;
+    }
+    &::-webkit-scrollbar-track {
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0);
+    }
+    &::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}
+body {
+	line-height: 1;
+    background-color: $main-bg;
+}
+a{
+    color: $link-color;
+    cursor: pointer;
+    &:hover{
+        color: $link-color;
+        text-decoration: underline;
+    }
+}
+textarea,input,button,label,a{
+    font-size: 14px;
+}
+button,input[type=submit],input[type=button],input[type=cancel]{
+    border-radius: 5px;
+    border: $default-border;
+    padding: 6px 8px;
+    background-color: $btn-bg;
+    text-align: center;
+}
+input[type=cancel]{
+    background-color: red;
+}
+textarea,input[type=text],input[type=password],input[type=number]{
+    border-radius: 5px;
+    border: $default-border;
+    padding: 6px 8px;
+    background-color: $input-bg;
+    color: $main-color;
+    &::placeholder{
+        color: $placeholder-color;
+    }
+}
+.mutted{
+    color: #888888;
+}
+.hidden{
+    display: none;
+}
+.text-center{
+    text-align: center;
+}
+/*Стиль форм*/
+form{
+    display: flex;
+    flex-flow: column nowrap;
+    align-content: flex-start;
+    >* {
+        margin: 5px 0;
+        align-self: stretch;
+    }
+    input[type=file]{
+        display: none;
+    }
+    &.inline{
+        flex-flow: row wrap;
+        justify-content:space-around;
+        >* {
+            margin: 5px;
+            flex: 1 1 auto;
+        }
+    }
+    .show-field{
+        display: flex;
+        justify-content: space-between;
+        margin:10px;
+        >.show-item{
+            flex: 1 1 auto;
+            align-self: stretch;
+            width:50%;
+            &.left{
+                text-align: right;
+                padding-right: 10px;
+            }
+            &.right{
+                text-align: left;
+                padding-left: 10px;
+            }
+        }
+    }
+}

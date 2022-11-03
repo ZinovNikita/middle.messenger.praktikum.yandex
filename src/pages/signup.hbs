@@ -1,0 +1,48 @@
+---
+title: Регистрация
+fields:
+  - label: Имя
+    type: text
+    name: first_name
+  - label: Фамилия
+    type: text
+    name: second_name
+  - label: Логин
+    type: text
+    name: login
+  - label: Email
+    type: text
+    name: email
+  - label: Телефон
+    type: text
+    name: phone
+  - label: Пароль
+    type: password
+    name: password
+  - label: Подтвердите пароль
+    type: password
+    name: password2
+---
+{{>header}}
+<main>
+    <div class="dark">
+        <div class="modal">
+            <h1 class="modal-title">{{title}}</h1>
+            <form id="signup-form">
+            {{#fields}}
+                <label>{{label}}</label>
+                <input type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
+            {{/fields}}
+                <input type="submit" value="Зарегистрироваться"/>
+                <a class="text-center" href="./signin.hbs">Войти</a>
+            </form>
+        </div>
+    </div>
+</main>
+<script>
+document.querySelector('#signup-form').addEventListener('submit',function(event){
+    event.preventDefault();
+    location.href = '/messager.html'
+})
+</script>
+{{>footer}}

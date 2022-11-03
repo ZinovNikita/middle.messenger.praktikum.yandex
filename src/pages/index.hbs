@@ -1,0 +1,69 @@
+---
+title: Чаты
+profile_fields:
+  - type: file
+    name: avatar
+  - label: Имя
+    type: text
+    name: first_name
+    value: Никита
+    show: true
+  - label: Фамилия
+    type: text
+    name: second_name
+    value: Зинов
+    show: true
+  - label: Логин
+    type: text
+    name: login
+    value: ZinovNA
+    show: true
+  - label: Email
+    type: text
+    name: email
+    value: email@yandex.ru
+    show: true
+  - label: Телефон
+    type: text
+    name: phone
+    value: "+79876543210"
+    show: true
+  - label: Старый пароль
+    type: password
+    name: oldPassword
+  - label: Новый пароль
+    type: password
+    name: newPassword
+  - label: Подтвердите пароль
+    type: password
+    name: newPassword2
+---
+{{>header}}
+<main>
+    <div class="container">
+        {{>sidebar}}
+        {{>chat}}
+    </div>
+</main>
+<div class="dark hidden">
+{{>profile prefix="profileInfo" readonly=true}}
+{{>profile prefix="profileEdit" readonly=false}}
+</div>
+<script>
+document.querySelector('.dark').addEventListener('click',function(event){
+    event.preventDefault();
+    event.target.classList.add('hidden');
+    event.target.querySelector('.modal').classList.add('hidden');
+})
+document.querySelector('#profile-edit-btn').addEventListener('click',function(event){
+    event.preventDefault();
+    document.querySelector('.dark.hidden').classList.remove('hidden');
+    document.querySelector('#profileEdit').classList.remove('hidden');
+})
+document.querySelector('#profile-info-btn').addEventListener('click',function(event){
+    event.preventDefault();
+    document.querySelector('.dark.hidden').classList.remove('hidden');
+    document.querySelector('#profileInfo').classList.remove('hidden');
+})
+</script>
+{{>footer}}
