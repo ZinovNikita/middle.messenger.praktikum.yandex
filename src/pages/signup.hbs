@@ -1,0 +1,53 @@
+---
+title: Регистрация
+fields:
+  - label: Имя
+    type: text
+    name: first_name
+  - label: Фамилия
+    type: text
+    name: second_name
+  - label: Логин
+    type: text
+    name: login
+  - label: Email
+    type: email
+    name: email
+  - label: Телефон
+    type: tel
+    name: phone
+  - label: Пароль
+    type: password
+    name: password
+  - label: Подтвердите пароль
+    type: password
+    name: password2
+---
+{{>header}}
+<main>
+    <dialog open class="modal">
+        <header class="modal-title">
+            <h3>{{title}}</h3>
+        </header>
+        <form id="signup-form" method="dialog">
+        {{#fields}}
+            <label>{{label}}</label>
+            <input type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
+        {{/fields}}
+        </form>
+        <footer class="modal-footer">
+            <a class="text-center" aria-label="Страница входа" href="./signin.hbs">Войти</a>
+            <button id="submit-form-btn">Зарегистрироваться</button>
+        </footer>
+    </dialog>
+</main>
+<script>
+document.querySelector('#submit-form-btn').addEventListener('click',(event)=>{
+    document.querySelector('#signup-form').dispatchEvent(new SubmitEvent('submit', { submitter: event.target }))
+})
+document.querySelector('#signup-form').addEventListener('submit',function(event){
+    event.preventDefault();
+    location.href = '/chats.html';
+})
+</script>
+{{>footer}}

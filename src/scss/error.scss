@@ -1,0 +1,9 @@
+/*Стиль страниц 404 и 500*/
+.error{
+    width: 100vw;
+    text-align: center;
+    margin: 35vh auto;
+    .message {
+        margin: 20px 0 80px 0;
+    }
+}

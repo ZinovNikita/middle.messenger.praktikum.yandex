@@ -1,0 +1,38 @@
+---
+title: Вход
+fields:
+  - label: Логин
+    type: text
+    name: login
+  - label: Пароль
+    type: password
+    name: password
+---
+{{>header}}
+<main>
+    <dialog open class="modal">
+        <header class="modal-title">
+            <h3>{{title}}</h3>
+        </header>
+        <form id="signin-form">
+        {{#fields}}
+            <label>{{label}}</label>
+            <input type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
+        {{/fields}}
+        </form>
+        <footer class="modal-footer">
+            <a class="text-center" aria-label="Страница регистрации" href="./signup.hbs">Регистрация</a>
+            <button id="submit-form-btn">Войти</button>
+        </footer>
+    </dialog>
+</main>
+<script>
+document.querySelector('#submit-form-btn').addEventListener('click',(event)=>{
+    document.querySelector('#signin-form').dispatchEvent(new SubmitEvent('submit', { submitter: event.target }))
+})
+document.querySelector('#signin-form').addEventListener('submit',function(event){
+    event.preventDefault();
+    location.href = '/chats.html'
+})
+</script>
+{{>footer}}
