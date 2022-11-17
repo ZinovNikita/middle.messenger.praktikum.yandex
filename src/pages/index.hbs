@@ -1,17 +1,14 @@
----
-title: Список страниц
----
-{{>header}}
-<main>
-    <nav class="index-menu">
-        <h1>Список страниц сайта</h1>
-        <ul>
-            <li><a aria-label="Страница регистрации" href="./signup.hbs">Страница регистрации</a></li>
-            <li><a aria-label="Страница входа" href="./signin.hbs">Страница входа</a></li>
-            <li><a aria-label="Список чатов" href="./chats.hbs">Список чатов</a></li>
-            <li><a aria-label="Страница ошибок 404" href="./404.hbs">Страница ошибок 404</a></li>
-            <li><a aria-label="Страница ошибок 5**" href="./500.hbs">Страница ошибок 5**</a></li>
-        </ul>
-    </nav>
-</main>
-{{>footer}}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>{{title}} | Мессенджер</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../scss/main.scss'>
+</head>
+<body>
+<main id="app"></main>
+<script type="module" src="../scripts/app.ts"></script>
+</body>
+</html>

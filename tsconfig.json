@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "declaration": false,
+        "emitDecoratorMetadata": true,
+        "target": "esnext",
+        "module": "esnext",
+        "strict": true,
+        "jsx":"preserve",
+        "importHelpers": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
+        "baseUrl": ".",
+        "paths": {
+            "*":["src/scripts/*"]
+        },
+        "lib": ["ESNext","DOM","DOM.Iterable","ScriptHost","ES6","ES2017"]
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

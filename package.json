@@ -31,11 +31,20 @@
   "homepage": "https://github.com/ZinovNikita/middle.messenger.praktikum.yandex#readme",
   "dependencies": {
     "express": "4.18.2",
+    "handlebars": "^4.7.7",
     "hbs": "4.2.0"
   },
   "devDependencies": {
     "@anikin/parcel-transformer-handlebars": "1.0.9",
     "@parcel/transformer-sass": "2.7.0",
-    "parcel": "2.7.0"
+    "@typescript-eslint/eslint-plugin": "^5.43.0",
+    "@typescript-eslint/parser": "^5.43.0",
+    "eslint": "^8.27.0",
+    "events": "^3.3.0",
+    "parcel": "2.7.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "typescript": "^4.8.4",
+    "util": "^0.12.5"
   }
 }
