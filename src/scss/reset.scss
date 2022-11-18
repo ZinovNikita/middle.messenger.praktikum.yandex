@@ -42,7 +42,7 @@ button,input[type=submit],input[type=button],input[type=reset]{
     background-color: $btn-bg;
     text-align: center;
 }
-input[type=reset]{
+input[type=reset],.btn-red{
     background-color: red;
 }
 textarea,input[type=text],input[type=password],input[type=number],input[type=email],input[type=tel]{
@@ -82,6 +82,10 @@ form{
         flex-flow: column nowrap;
         label{
             margin-bottom: 4px;
+        }
+        >small.error-msg{
+            padding-top: 5px;
+            color: red;
         }
     }
     &.inline{

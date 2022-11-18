@@ -1,22 +1,47 @@
 import Handlebars from 'handlebars';
-export type ComponentOptions = {
-    attrs?: {[id:string]:unknown},
-    props?: {[id:string]:unknown},
-    data?: {[id:string]:unknown},
-    events?: {[id:string]:Function},
-    watch?: {[id:string]:Function},
+export type obj = {[id:string]:(string|number|boolean|undefined|obj|Function|unknown|EventListenerOrEventListenerObject|null)}
+export type objfunc = {[id:string]:Function}
+export type objevent = {[id:string]:(EventListenerOrEventListenerObject|null)[]}
+export type ComponentOptionsType = {
+    attrs?: obj,
+    props?: obj,
+    data?: obj,
+    events?: objfunc,
+    methods?: objfunc,
 }
-export class Component extends EventTarget{
-    private element: Element|any;
+export type ComponentType = {
+    attrs: obj,
+    props: obj,
+    data: obj,
+    events: objfunc,
+    methods: objfunc,
+    $compile: Function,
+    $find: Function,
+    $findAll: Function,
+    $on: Function,
+    $off: Function,
+    $emit: Function,
+    $attach: Function,
+    $el:Element,
+    $uid:string,
+}
+export class Component extends EventTarget implements ComponentType{
+    private element: Element;
     private template: string;
-    private event_list: {[id:string]:(EventListenerOrEventListenerObject|null)[]} = {};
-    public attrs: {[id:string]:unknown} = {};
-    public props: {[id:string]:unknown} = {};
-    public data: {[id:string]:unknown} = {};
-    public events: {[id:string]:Function} = {};
-    public watch: {[id:string]:Function} = {};
-    public uid: string;
-    constructor(template:string, tagName:string="div", options?:ComponentOptions){
+    private event_list: objevent = {};
+    private uid: string;
+    public attrs: obj = {};
+    public props: obj = {};
+    public data: obj = {};
+    public events: objfunc = {};
+    public methods: objfunc = {};
+    public get $el():Element{
+        return this.element;
+    }
+    public get $uid():string{
+        return this.uid;
+    }
+    constructor(template:string, tagName:string="div", options?:ComponentOptionsType){
         super();
         this.element = document.createElement(tagName);
         this.uid = `uid_${Math.floor(new Date().getTime()*(Math.random()*100)).toString(16)}`;
@@ -31,19 +56,16 @@ export class Component extends EventTarget{
         this.props = new Proxy(this.element,{
             set: (target:any, prop:string, val: any, old:any)=>{
                 if(prop==='innerHTML')
-                    throw new Error('Отказано в доступе');
+                    return true;
                 target[prop] = val;
-                this.element[prop] = target[prop];
+                this.element[prop as keyof Object] = target[prop];
                 return true;
             }
         })
         this.data = new Proxy({},{
             set: (target:any, prop:string, val: any, old:any)=>{
                 target[prop] = val;
-                this.element.innerHTML = this.compile(target);
-                if(typeof this.watch[prop] === "function"){
-                    this.watch[prop].call(this,val,old);
-                }
+                this.element.innerHTML = this.$compile(target);
                 return true;
             }
         })
@@ -51,23 +73,26 @@ export class Component extends EventTarget{
         Object.assign(this.props, options?.props);
         Object.assign(this.data, options?.data);
         Object.assign(this.events, options?.events);
-        Object.assign(this.watch, options?.watch);
+        Object.assign(this.methods, options?.methods);
         this.props.id = this.uid;
         this.data.uid = this.uid;
         for(let k in this.events){
-            this.$on(k,this.events[k]);
+            this.$on(k,this.events[k as keyof obj]);
         }
     }
-    compile(data:unknown){
+    public $compile(data:obj){
         return Handlebars.compile(this.template).call(this,data);
     }
-    addHelper(name:string,fn:Handlebars.HelperDelegate){
-        Handlebars.registerHelper(name, fn);
+    public $find(selector:string):Element{
+        let tmp = this.$el.querySelector(selector);
+        if(tmp===null)
+            throw new Error(`Элемент ${selector} не найден`);
+        return tmp;
     }
-    get $el():Element{
-        return this.element;
+    public $findAll(selector:string){
+        return this.$el.querySelectorAll(selector);
     }
-    $on(type:string,callback:Function):void{
+    public $on(type:string,callback:Function):void{
         if(!Array.isArray(this.event_list[type]))
             this.event_list[type] = [];
         this.event_list[type].push((event:Event)=>{
@@ -75,7 +100,7 @@ export class Component extends EventTarget{
         });
         this.addEventListener(type,this.event_list[type][this.event_list[type].length-1]);
     }
-    $off(type:string):void{
+    public $off(type:string):void{
         if(Array.isArray(this.event_list[type])){
             this.event_list[type].forEach(e=>{
                 this.removeEventListener(type,e)
@@ -83,12 +108,12 @@ export class Component extends EventTarget{
         }
         delete this.event_list[type];
     }
-    $emit(type:string,...args:unknown[]):void{
+    public $emit(type:string,...args:unknown[]):void{
         this.dispatchEvent(new CustomEvent(type,{
             detail: args
         }))
     }
-    attachParent(el: Element){
+    public $attach(el: Element){
         el.appendChild(this.element);
     }
 }

@@ -10,9 +10,7 @@
     "src/pages/index.hbs",
     "src/pages/chats.hbs",
     "src/pages/signin.hbs",
-    "src/pages/signup.hbs",
-    "src/pages/404.hbs",
-    "src/pages/500.hbs"
+    "src/pages/signup.hbs"
   ],
   "scripts": {
     "dev": "parcel -p 3000 --no-cache --no-source-maps",

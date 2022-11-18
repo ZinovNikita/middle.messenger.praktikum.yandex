@@ -1,8 +1,5 @@
 import {Component} from "./component";
-export default class Index extends Component{
-    private menu:any;
-    constructor(){
-        super(`
+const index_template =`
 <nav class="index-menu">
     <h1>Список страниц сайта</h1>
     <ul id="{{uid}}-menu">
@@ -10,7 +7,10 @@ export default class Index extends Component{
         <li><a data-link-to="{{to}}" aria-label="{{title}}">{{text}}</a></li>
     {{/pages}}
     </ul>
-</nav>`,'main',{
+</nav>`;
+export default class Index extends Component{
+    constructor(){
+        super(index_template,'main',{
             data:{
                 pages:[
                     {text:'Страница регистрации', title:'Страница регистрации', to:'signup'},
@@ -21,8 +21,7 @@ export default class Index extends Component{
                 ]
             }
         });
-        this.menu = this.$el.querySelector(`#${this.uid}-menu`);
-        this.menu.addEventListener("click",(event:any)=>{
+        this.$el.querySelector(`#${this.$uid}-menu`)?.addEventListener("click",(event:any)=>{
             if(event.target.tagName==='A'){
                 this.$emit('route',event.target.dataset.linkTo);
             }
