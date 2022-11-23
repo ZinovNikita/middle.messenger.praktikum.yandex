@@ -8,13 +8,12 @@
   "description": "---",
   "source": [
     "src/pages/index.hbs",
-    "src/pages/chats.hbs",
-    "src/pages/signin.hbs",
-    "src/pages/signup.hbs"
+    "src/pages/chats.hbs"
   ],
   "scripts": {
     "dev": "parcel -p 3000 --no-cache --no-source-maps",
     "build": "parcel build",
+    "lint": "stylelint \"src/scss/*.*\"",
     "start": "npm run build && node ./app.js"
   },
   "repository": {
@@ -42,6 +41,9 @@
     "parcel": "2.7.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
+    "stylelint": "^14.15.0",
+    "stylelint-config-standard": "^29.0.0",
+    "stylelint-scss": "^4.3.0",
     "typescript": "^4.8.4",
     "util": "^0.12.5"
   }

@@ -1,67 +1,19 @@
----
-title: Чаты
-profile_fields:
-  - type: image
-    name: avatar
-  - label: Имя
-    type: text
-    name: first_name
-    value: Никита
-    show: true
-  - label: Фамилия
-    type: text
-    name: second_name
-    value: Зинов
-    show: true
-  - label: Логин
-    type: text
-    name: login
-    value: ZinovNA
-    show: true
-  - label: Email
-    type: email
-    name: email
-    value: email@yandex.ru
-    show: true
-  - label: Телефон
-    type: tel
-    name: phone
-    value: "+79876543210"
-    show: true
-  - label: Старый пароль
-    type: password
-    name: oldPassword
-  - label: Новый пароль
-    type: password
-    name: newPassword
-  - label: Подтвердите пароль
-    type: password
-    name: newPassword2
----
-{{>header}}
-<main>
-    <div class="container">
-        {{>sidebar}}
-        {{>chat}}
-    </div>
-</main>
-{{>profile prefix="profileInfo" readonly=true}}
-{{>profile prefix="profileEdit" readonly=false}}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title></title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../scss/main.scss'>
+</head>
+<body>
+<app id="app"></app>
+<script type="module" src="../scripts/app.ts"></script>
 <script>
-document.querySelectorAll('.modal-close').forEach(el=>{
-    el.addEventListener('click',(event)=>{
-        if(event.target.classList.contains('modal-close')){
-            event.target.parentNode.parentNode.close();
-        }
-    })
-})
-document.querySelector('#profile-edit-btn').addEventListener('click',function(event){
-    event.preventDefault();
-    document.querySelector('#profileEdit').showModal();
-})
-document.querySelector('#profile-info-btn').addEventListener('click',function(event){
-    event.preventDefault();
-    document.querySelector('#profileInfo').showModal();
+document.addEventListener("app-loaded",(event)=>{
+    event.detail.$route('chats');
 })
 </script>
-{{>footer}}
+</body>
+</html>

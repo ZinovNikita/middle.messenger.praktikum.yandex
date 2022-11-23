@@ -1,115 +1,159 @@
-/*Сброс стиля*/
+/* Сброс стиля */
 * {
-    margin:0;
-    padding:0;
-    font-family:sans-serif;
-    color:$main-color;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    color: $main-color;
     box-sizing: border-box;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0.1);
+    scrollbar-color: rgba(255 255 255 / 0%) rgba(255 255 255 / 10%);
+
     &::-webkit-scrollbar {
         width: 10px;
-        width: 10px;
     }
+
     &::-webkit-scrollbar-track {
         border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0);
+        background-color: rgba(255 255 255 / 0%);
     }
+
     &::-webkit-scrollbar-thumb {
         border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(255 255 255 / 10%);
     }
 }
+
 body {
-	line-height: 1;
+    line-height: 1;
     background-color: $main-bg;
 }
-a{
+
+textarea,
+input,
+button,
+label,
+a {
+    font-size: 14px;
+}
+
+a {
     color: $link-color;
     cursor: pointer;
-    &:hover{
+
+    &:hover {
         color: $link-color;
         text-decoration: underline;
     }
 }
-textarea,input,button,label,a{
-    font-size: 14px;
+
+input[type="file"] {
+    display: none;
 }
-button,input[type=submit],input[type=button],input[type=reset]{
+
+input[type="reset"],
+.btn-red {
+    background-color: red;
+}
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+.btn {
+    &:disabled {
+        background-color: #448;
+    }
+
     border-radius: 5px;
     border: $default-border;
     padding: 6px 8px;
     background-color: $btn-bg;
     text-align: center;
 }
-input[type=reset],.btn-red{
-    background-color: red;
-}
-textarea,input[type=text],input[type=password],input[type=number],input[type=email],input[type=tel]{
+
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="email"],
+input[type="tel"] {
     border-radius: 5px;
     border: $default-border;
     padding: 6px 8px;
     background-color: $input-bg;
     color: $main-color;
-    &::placeholder{
+
+    &::placeholder {
         color: $placeholder-color;
     }
 }
-.mutted{
-    color: #888888;
+
+.mutted {
+    color: #888;
 }
-.hidden{
+
+.hidden {
     display: none;
 }
-.text-center{
+
+.text-center {
     text-align: center;
 }
-/*Стиль форм*/
-form{
+
+/* Стиль форм */
+
+form {
     display: flex;
     flex-flow: column nowrap;
     align-content: flex-start;
-    >* {
+
+    > * {
         margin: 5px 0;
         align-self: stretch;
     }
-    input[type=file]{
-        display: none;
-    }
-    fieldset{
+
+    fieldset {
         border: none;
         display: flex;
         flex-flow: column nowrap;
-        label{
+
+        label {
             margin-bottom: 4px;
         }
-        >small.error-msg{
+
+        > small.error-msg {
             padding-top: 5px;
             color: red;
         }
     }
-    &.inline{
+
+    &.inline {
         flex-flow: row wrap;
-        justify-content:space-around;
-        >* {
+        justify-content: space-around;
+
+        > * {
             margin: 5px;
             flex: 1 1 auto;
         }
     }
-    .show-field{
+
+    .show-field {
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
-        margin:10px;
-        >.show-item{
+        margin: 10px;
+
+        > .show-item {
             flex: 1 1 auto;
             align-self: stretch;
-            width:50%;
-            &.left{
+            width: 50%;
+
+            &.left {
                 text-align: right;
                 padding-right: 10px;
             }
-            &.right{
+
+            &.right {
                 text-align: left;
                 padding-left: 10px;
             }

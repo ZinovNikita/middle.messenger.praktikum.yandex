@@ -1,9 +1,16 @@
-type fetch2Options = {
+type fetch2OptionsType = {
     method: string,
     timeout?: number,
     headers?: {[id:string]:unknown},
     params?: {[id:string]:unknown},
     body?: Document|XMLHttpRequestBodyInit|undefined,
+}
+type fetch2Type = {
+    $get: Function,
+    $post: Function,
+    $put: Function,
+    $delete: Function,
+    $request: Function
 }
 class Fetch2{
     private stringify(data:{[id:string]:unknown}) {
@@ -22,43 +29,43 @@ class Fetch2{
             return '';
         return `?${str.join('&')}`;
     }
-    get(url:string, options:fetch2Options){
+    public $get(url:string, options:fetch2OptionsType){
         options = Object.assign({method:"GET",timeout:5000},options);
         options.method = "GET";
         if(typeof options.params==='object'){
             url += this.stringify(options.params)
             delete options.params;
         }
-        return this.request(url, options);
+        return this.$request(url, options);
     }
-    post(url:string, options:fetch2Options){
+    public $post(url:string, options:fetch2OptionsType){
         options = Object.assign({method:"POST",timeout:5000},options);
         options.method = "POST";
         if(typeof options.params==='object'){
             options.body = JSON.stringify(options.params);
             delete options.params;
         }
-        return this.request(url, options);
+        return this.$request(url, options);
     }
-    put(url:string, options:fetch2Options){
+    public $put(url:string, options:fetch2OptionsType){
         options = Object.assign({method:"PUT",timeout:5000},options);
         options.method = "PUT";
         if(typeof options.params==='object'){
             options.body = JSON.stringify(options.params);
             delete options.params;
         }
-        return this.request(url, options);
+        return this.$request(url, options);
     }
-    delete(url:string, options:fetch2Options){
+    public $delete(url:string, options:fetch2OptionsType){
         options = Object.assign({method:"DELETE",timeout:5000},options);
         options.method = "DELETE";
         if(typeof options.params==='object'){
             options.body = JSON.stringify(options.params);
             delete options.params;
         }
-        return this.request(url, options);
+        return this.$request(url, options);
     };
-    request(url:string, options:fetch2Options){
+    public $request(url:string, options:fetch2OptionsType){
         options = Object.assign({method:"GET",timeout:5000},options);
         return new Promise(function (resolve, reject) {
             try{
@@ -93,5 +100,5 @@ class Fetch2{
         });
     }
 } 
-const fetch2 = new Fetch2();
+const fetch2:fetch2Type = new Fetch2();
 export default fetch2;

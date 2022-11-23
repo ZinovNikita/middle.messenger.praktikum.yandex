@@ -18,6 +18,7 @@ export type ComponentType = {
     $compile: Function,
     $find: Function,
     $findAll: Function,
+    $title: string,
     $on: Function,
     $off: Function,
     $emit: Function,
@@ -25,22 +26,7 @@ export type ComponentType = {
     $el:Element,
     $uid:string,
 }
-export class Component extends EventTarget implements ComponentType{
-    private element: Element;
-    private template: string;
-    private event_list: objevent = {};
-    private uid: string;
-    public attrs: obj = {};
-    public props: obj = {};
-    public data: obj = {};
-    public events: objfunc = {};
-    public methods: objfunc = {};
-    public get $el():Element{
-        return this.element;
-    }
-    public get $uid():string{
-        return this.uid;
-    }
+export class Component extends EventTarget{
     constructor(template:string, tagName:string="div", options?:ComponentOptionsType){
         super();
         this.element = document.createElement(tagName);
@@ -66,6 +52,7 @@ export class Component extends EventTarget implements ComponentType{
             set: (target:any, prop:string, val: any, old:any)=>{
                 target[prop] = val;
                 this.element.innerHTML = this.$compile(target);
+                this.$emit('html-update')
                 return true;
             }
         })
@@ -80,7 +67,39 @@ export class Component extends EventTarget implements ComponentType{
             this.$on(k,this.events[k as keyof obj]);
         }
     }
+    private element: Element;
+    private template: string;
+    private event_list: objevent = {};
+    private uid: string;
+    public attrs: obj = {};
+    public props: obj = {};
+    public data: obj = {};
+    public events: objfunc = {};
+    public methods: objfunc = {};
+    public get $el():Element{
+        return this.element;
+    }
+    public get $uid():string{
+        return this.uid;
+    }
+    public $title: string = "";
     public $compile(data:obj){
+        Handlebars.registerHelper('if_eq', function(this:unknown, a, b, opts){
+            if (a == b) {
+                return opts.fn(this);
+            } else {
+                return opts.inverse(this);
+            }
+        });
+        Handlebars.registerHelper('if_include', function(this:unknown, a, b, opts){
+            if(b===null || b===undefined || (typeof b==='string' && b.length===0))
+                return opts.fn(this);
+            if (a.indexOf(b)>=0) {
+                return opts.fn(this);
+            } else {
+                return opts.inverse(this);
+            }
+        });
         return Handlebars.compile(this.template).call(this,data);
     }
     public $find(selector:string):Element{
@@ -115,5 +134,6 @@ export class Component extends EventTarget implements ComponentType{
     }
     public $attach(el: Element){
         el.appendChild(this.element);
+        this.$emit('attach');
     }
 }

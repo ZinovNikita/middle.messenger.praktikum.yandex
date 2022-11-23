@@ -1,4 +1,4 @@
-import {Component} from "./component";
+import {Component} from "../components/component";
 const index_template =`
 <nav class="index-menu">
     <h1>Список страниц сайта</h1>
@@ -8,7 +8,7 @@ const index_template =`
     {{/pages}}
     </ul>
 </nav>`;
-export default class Index extends Component{
+export default class Main extends Component{
     constructor(){
         super(index_template,'main',{
             data:{
@@ -21,6 +21,7 @@ export default class Index extends Component{
                 ]
             }
         });
+        this.$title = "Список страниц сайта";
         this.$el.querySelector(`#${this.$uid}-menu`)?.addEventListener("click",(event:any)=>{
             if(event.target.tagName==='A'){
                 this.$emit('route',event.target.dataset.linkTo);

@@ -7,16 +7,35 @@ const modal_template:string = `
 <form id="{{uid}}-form" data-obj-type="modal-form">
 {{#fields}}
     {{#if readonly}}
+        {{#if_eq type 'avatar'}}
+        <fieldset id="{{../uid}}-fieldset-{{name}}">
+            <label class="avatar-image">
+                <img data-obj-type="image" src="{{value}}"/>
+            </label>
+        </fieldset>
+        {{else}}
         <fieldset class="show-field" id="{{../uid}}-fieldset-{{name}}">
             <span class="show-item left">{{label}}</span>
             <span class="show-item right">{{value}}</span>
         </fieldset>
+        {{/if_eq}}
     {{else}}
+        {{#if_eq type 'avatar'}}
+        <fieldset id="{{../uid}}-fieldset-{{name}}">
+            <label>{{label}}</label>
+            <label class="avatar-image">
+                <input data-obj-type="field" type="file" accept="image/*" name="{{name}}"/>
+                <img data-obj-type="image" src="{{value}}"/>
+            </label>
+            <small class="error-msg"></small>
+        </fieldset>
+        {{else}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
             <input data-obj-type="field" type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"/>
             <small class="error-msg"></small>
         </fieldset>
+        {{/if_eq}}
     {{/if}}
 {{/fields}}
 </form>
@@ -25,10 +44,14 @@ const modal_template:string = `
     <button id="{{uid}}-ok" data-obj-type="ok-btn">{{ok_title}}</button>
 </footer>`;
 export default class Modal extends Component{
-    private fvalues: obj = {};
     constructor(options?:ComponentOptionsType){
         super(modal_template,'dialog',options);
         this.props.className = "modal";
+        this.$on('html-update',this.onMount.bind(this));
+        this.onMount()
+    }
+    private fvalues: obj = {};
+    private onMount(){
         (<obj[]>this.data.fields).forEach((f:obj)=>{
             this.fvalues[f.name as keyof obj] = f.value;
         })
@@ -47,33 +70,29 @@ export default class Modal extends Component{
         this.$close(false)
     }
     private onOk(){
-        if(this.$is_valid()){
-            this.$emit("ok");
-            this.$close(true)
-        }
+        this.$is_valid().then((success:boolean)=>{
+            if(success===true){
+                this.$emit("ok");
+                this.$close(true)
+            }
+        })
     }
     private onClose(event:any){
         (<any>this.$el).close();
         this.$el.remove();
     }
-    public $is_valid(key?:string|undefined):boolean{
-        if(typeof this.methods.validator==='function'){
-            let res:boolean = true;
-            if(typeof key==="string"){
-                let msg = this.methods.validator.call(this,key,this.fvalues[key]);
-                this.$find(`#${this.$uid}-fieldset-${key}>.error-msg`).textContent = msg
-                return msg.length===0;
-            }
-            else{
-                for(let k in this.fvalues){
-                    let msg = this.methods.validator.call(this,k,this.fvalues[k]);
-                    this.$find(`#${this.$uid}-fieldset-${k}>.error-msg`).textContent = msg
-                    res &&= msg.length===0;
-                }
-            }
-            return res
-        }
-        return true;
+    public $field_error(key:string,msg:string=''){
+        this.$find(`#${this.$uid}-fieldset-${key}>.error-msg`).textContent = msg;
+    }
+    public $is_valid(key:string|undefined=undefined):Promise<boolean>{
+        if(typeof this.methods.validator==='function')
+            return this.methods.validator.call(this,key);
+        else
+            return new Promise((resolve:Function)=>{
+                for(let k in this.fvalues)
+                    this.$field_error(k)
+                resolve({success:true});
+            })
     }
     public $open(){
         this.$attach(document.body);
