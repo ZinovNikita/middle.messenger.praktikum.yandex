@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "jsxImportSource": "preact",
+        "isolatedModules": true,
         "declaration": false,
         "emitDecoratorMetadata": true,
         "target": "esnext",
@@ -15,7 +17,7 @@
         "sourceMap": true,
         "baseUrl": ".",
         "paths": {
-            "*":["src/scripts/*"]
+            "*":["src/*"]
         },
         "lib": ["ESNext","DOM","DOM.Iterable","ScriptHost","ES6","ES2017"]
     },

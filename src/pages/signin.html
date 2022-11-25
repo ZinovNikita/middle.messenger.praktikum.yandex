@@ -9,10 +9,10 @@
 </head>
 <body>
 <app id="app"></app>
-<script type="module" src="../scripts/app.ts"></script>
+<script type="module" src="../app.ts"></script>
 <script>
-document.addEventListener("app-loaded",(event)=>{
-    event.detail.$route('index');
+document.addEventListener("appMounted",(event)=>{
+    event.detail.$route('signin');
 })
 </script>
 </body>

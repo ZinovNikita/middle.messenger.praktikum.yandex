@@ -1,4 +1,7 @@
 {
+    "extends": [
+        "eslint-config-standard"
+    ],
     "env": {
         "browser": true,
         "es2021": true
@@ -14,5 +17,13 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "indent": ["error", 4],
+        "semi": "off",
+        "comma-spacing": "off",
+        "no-useless-escape": "off",
+        "prefer-promise-reject-errors": "off",
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "error"
     }
 }
