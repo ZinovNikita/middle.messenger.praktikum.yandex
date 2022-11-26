@@ -1,8 +1,9 @@
-/*Модальное окно*/
-.modal{
+/* Модальное окно */
+
+.modal {
     background-color: $sidebar-bg;
     position: relative;
-    top:10vh;
+    top: 10vh;
     border-radius: 5px;
     border: $default-border;
     padding: 10px;
@@ -10,41 +11,63 @@
     width: 600px;
     overflow-x: hidden;
     overflow-y: auto;
-    >.modal-title{
+
+    >.modal-title {
         border-bottom: $default-border;
         padding: 10px 0;
         padding-top: 5px;
         margin-bottom: 10px;
         display: flex;
         justify-content: space-between;
-        >*{
+
+        >* {
             align-self: center;
         }
-        .modal-close{
+
+        .modal-close {
             display: block;
             text-align: center;
-            padding: 0px 4px;
+            padding: 0 4px;
             font-size: 20px;
             cursor: pointer;
         }
     }
-    >.modal-footer{
+
+    >.modal-footer {
         border-top: $default-border;
         padding: 10px 0;
         padding-bottom: 5px;
         margin-top: 10px;
         text-align: right;
     }
-    &.small{
+
+    &.small {
         left: calc(50vw - 200px);
         width: 400px;
     }
-    &.medium{
+
+    &.medium {
         left: calc(50vw - 300px);
         width: 600px;
     }
-    &.big{
+
+    &.big {
         left: calc(50vw - 500px);
         width: 1000px;
+    }
+
+    .avatar-image {
+        border-radius: 50%;
+        max-height: 200px;
+        max-width: 200px;
+        height: 200px;
+        width: 200px;
+        margin: 0 auto;
+        overflow: hidden;
+
+        >img {
+            height: 100%;
+            width: auto;
+        }
     }
 }

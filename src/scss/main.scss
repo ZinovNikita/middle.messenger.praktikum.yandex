@@ -1,156 +1,202 @@
 $main-bg: #0e0e10;
-$main-color: #ffffff;
+$main-color: #fff;
 $sidebar-bg: #1f1f23;
 $link-color: #bf94ff;
-$btn-bg: #0000ff;
+$btn-bg: #00f;
 $default-border: 1px solid #848484;
 $input-bg: #222529;
-$placeholder-color: #dddddd;
-@import 'reset';
-@import 'error';
-@import 'modal';
-/*Стиль основной страницы*/
-.index-menu{
-    margin-left:100px;
-    margin-top:100px;
-    h1{
+$placeholder-color: #ddd;
+
+@import "reset";
+@import "error";
+@import "modal";
+
+/* Стиль основной страницы */
+
+.index-menu {
+    margin-left: 100px;
+    margin-top: 100px;
+
+    h1 {
         margin-bottom: 20px;
     }
-    li{
+
+    li {
         font-size: 18px;
-        margin:10px;
+        margin: 10px;
         list-style-position: inside;
     }
 }
-.container{
+
+.container {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
     display: flex;
     flex-flow: row nowrap;
     align-content: flex-start;
-    .chat-image{
+
+    .chat-image {
         height: 50px;
         margin: 10px;
         width: auto;
         border-radius: 50%;
     }
-    >.sidebar{
+
+    > .sidebar {
         background-color: $sidebar-bg;
         min-width: 400px;
         max-width: 400px;
         width: 400px;
         height: 100%;
         border-right: $default-border;
-        >.search-box{
+
+        > .search-box {
             height: 50px;
             border-bottom: $default-border;
-            padding:10px 5px;
-            >.profile {
-                max-width:80px;
+            padding: 10px 5px;
+
+            > .profile {
+                max-width: 80px;
                 margin-left: 0;
             }
         }
-        >.chat-list{
+
+        > .chat-list {
             height: calc(100vh - 71px);
             overflow-y: scroll;
             overflow-x: hidden;
             display: flex;
             flex-flow: column nowrap;
             align-content: flex-start;
-            >.chat-item {
+
+            > .chat-item {
                 list-style-type: none;
                 list-style-position: inside;
                 display: flex;
                 align-content: flex-start;
                 height: 70px;
                 border-bottom: $default-border;
-                &.active{
+                cursor: default;
+
+                &.active {
                     background-color: $main-bg;
                 }
-                >.chat-text{
+
+                > .chat-text {
                     display: flex;
                     flex-flow: column nowrap;
                     align-content: flex-start;
-                    >.chat-title{
+
+                    > .chat-title {
                         margin: 10px 0;
                     }
                 }
             }
         }
     }
-    >.chat-box{
+
+    > .chat-box {
         display: flex;
         flex-flow: column nowrap;
         align-content: flex-start;
         width: calc(100% - 400px);
-        >.chat-header {
+
+        > .chat-header {
             flex: 1 1 auto;
             align-self: stretch;
             background-color: $sidebar-bg;
             max-height: 70px;
             display: flex;
             justify-content: space-between;
-            >*{
+
+            > * {
                 display: block;
                 align-self: center;
                 margin: 10px;
             }
         }
-        >.chat-input-box{
-            margin:20px;
-            max-height: 100px;
-            input[type=submit]{
-                max-width:100px;
+
+        > .chat-input-box {
+            margin: 20px;
+            max-height: 200px;
+
+            input[type="submit"] {
+                max-width: 100px;
+            }
+
+            label.image-files {
+                max-width: 30px;
+                font-size: 30px;
+                text-align: center;
+            }
+
+            .chat-input-images {
+                margin-bottom: 10px;
+
+                img {
+                    max-height: 100px;
+                    max-width: 100px;
+                }
             }
         }
-        >.chat-messages{
-            flex: 1 1 auto;
+
+        > .chat-messages {
             align-self: stretch;
             overflow-x: hidden;
             overflow-y: auto;
             display: flex;
             flex-flow: column nowrap;
-            justify-content: flex-end;
-            >.message-block{
+            margin-top: auto;
+
+            > .message-block {
                 display: flex;
                 flex-flow: row nowrap;
-                >.message-item{
+
+                > .message-item {
                     max-width: 80%;
                     background-color: $sidebar-bg;
                     padding: 10px;
-                    margin:10px;
-                    >.message-title{
+                    margin: 10px;
+
+                    > .message-title {
                         margin-bottom: 5px;
                         display: block;
                     }
-                    >.message-images{
+
+                    > .message-images {
                         display: flex;
                         margin-bottom: 5px;
                         flex-flow: row wrap;
-                        >img{
+
+                        > img {
                             display: block;
                             max-height: 200px;
                             max-width: 200px;
                             flex: 1 1 200px;
-                            margin:2px
+                            margin: 2px;
                         }
                     }
-                    >.message-time{
+
+                    > .message-time {
                         text-align: right;
                         margin-top: 5px;
                         display: block;
                     }
                 }
-                &.right{
-                    justify-content:flex-end;
-                    >.message-item{
-                        border-radius: 5px 5px 0 5px;
+
+                &.right {
+                    justify-content: flex-end;
+
+                    >.message-item {
+                        border-radius: 5px 5px 0;
                     }
                 }
-                &.left{
-                    justify-content:flex-start;
-                    >.message-item{
+
+                &.left {
+                    justify-content: flex-start;
+
+                    > .message-item {
                         border-radius: 5px 5px 5px 0;
                     }
                 }
