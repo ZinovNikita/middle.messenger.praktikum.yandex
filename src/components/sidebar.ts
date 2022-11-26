@@ -130,15 +130,18 @@ export default class Sidebar extends Component {
         })
     }
 
+    // @ts-ignore - used after template compilation from element events
     private onSearch (event:Event) {
         event.preventDefault();
         this.data.chatSearch = (<HTMLFormElement>event.target).chatSearch.value;
     }
 
+    // @ts-ignore - used after template compilation from element events
     private openProfile () {
         this.profileEditModal.$open()
     }
 
+    // @ts-ignore - used after template compilation from element events
     private chatSelect (event:Event) {
         const target = (<HTMLElement>event.target).closest('.chat-item');
         if (target !== null) {

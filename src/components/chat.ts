@@ -83,6 +83,7 @@ export default class Chat extends Component {
     private messages: obj[] = [];
     private message: string = '';
     private profileInfoModal: Modal;
+    // @ts-ignore - used after template compilation from element events
     private openProfileInfo () {
         this.profileInfoModal.$open();
     }
@@ -114,6 +115,7 @@ export default class Chat extends Component {
         });
     }
 
+    // @ts-ignore - used after template compilation from element events
     private sendMessage (event:Event) {
         event.preventDefault();
         const form = <HTMLFormElement>event.target;
@@ -135,6 +137,7 @@ export default class Chat extends Component {
         })
     }
 
+    // @ts-ignore - used after template compilation from element events
     private onInput (event:Event) {
         const msg:string = (<HTMLTextAreaElement>event.target).value;
         if (this.message !== msg) { this.message = msg; }
@@ -142,6 +145,7 @@ export default class Chat extends Component {
         (<HTMLInputElement> this.$find('#message-form>input[type=submit]')).disabled = (msg.length === 0);
     }
 
+    // @ts-ignore - used after template compilation from element events
     private addFile (event:Event) {
         this.fileToBase64(<FileList>(<any>event.target).files).then((images:obj[]) => {
             Object.assign(this.data,{ images,message: this.message });
