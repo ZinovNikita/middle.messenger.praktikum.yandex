@@ -118,8 +118,8 @@ export default class Chat extends Component {
     }
 
     private scrollEnd () {
-        let el = this.$find(`#${this.$uid}-message-list`);
-        if(el!==null){
+        const el = this.$find(`#${this.$uid}-message-list`);
+        if (el !== null) {
             el.scrollTo(0,el.scrollHeight);
         }
     }
