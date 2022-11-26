@@ -4,13 +4,19 @@ import Chat from '../components/chat';
 const chatsTemplate:string = '';
 const chats:obj[] = [{
     id: 1,
-    title: 'Иванов Иван',
-    url_img: 'https://thispersondoesnotexist.com/image?q=11111111111111',
+    first_name: 'Иван',
+    second_name: 'Иванов',
+    email: 'email1@email.ru',
+    phone: '+79876543211',
+    avatar: 'https://thispersondoesnotexist.com/image?q=11111111111111',
     last_message: 'Привет! Я приехал!'
 },{
     id: 2,
-    title: 'Петров Петр',
-    url_img: 'https://thispersondoesnotexist.com/image?q=2222222222222222222',
+    first_name: 'Петр',
+    second_name: 'Петров',
+    email: 'email2@email.ru',
+    phone: '+79876543212',
+    avatar: 'https://thispersondoesnotexist.com/image?q=2222222222222222222',
     last_message: 'Привет! Я не приехал!'
 }];
 export default class Chats extends Component {

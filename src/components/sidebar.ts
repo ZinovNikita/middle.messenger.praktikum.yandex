@@ -1,31 +1,30 @@
 import Component from './component';
 import Modal from '../components/modal';
 const sidebarTemplate:string = `
-<form id="{{uid}}-search-form" class="search-box inline">
+<form id="search-form" class="search-box inline" {{on 'submit' 'onSearch' '#search-form'}} >
     <input id="{{uid}}-chat-search" type="text" name="chatSearch" class="search-input" placeholder="Поиск" value="{{chatSearch}}" style="width:68%"/>
-    <button type="button" id="{{uid}}-profile-btn" class="profile">Профиль</button>
+    <button type="button" id="profile-btn" class="profile"  {{on 'click' 'openProfile' '#profile-btn'}}>Профиль</button>
 </form>
-<ul id="{{uid}}-chats" class="chat-list">
+<ul class="chat-list" {{on 'click' 'chatSelect' '.chat-list'}}>
 {{#chats}}
-{{#if_include title ../chatSearch}}
+{{#if_filtred first_name second_name ../chatSearch}}
     {{#if active}}
-    <li id="{{../uid}}-chat-{{id}}" class="chat-item active">
+    <li chat-id="{{id}}" class="chat-item active">
     {{else}}
-    <li id="{{../uid}}-chat-{{id}}" class="chat-item">
+    <li chat-id="{{id}}" class="chat-item">
     {{/if}}
-        <img alt="Аватар {{title}}" class="chat-image" src="{{url_img}}"/>
+        <img alt="Аватар {{first_name}} {{second_name}}" class="chat-image" src="{{avatar}}"/>
         <div class="chat-text">
-            <b class="chat-title">{{title}}</b>
+            <b class="chat-title">{{first_name}} {{second_name}}</b>
             <span class="mutted">{{last_message}}</span>
         </div>
     </li>
-{{/if_include}}
+{{/if_filtred}}
 {{/chats}}
 </ul>`;
 export default class Sidebar extends Component {
     constructor (chats:obj[]) {
         super(sidebarTemplate,'nav',{ props: { className: 'sidebar' },data: { chats } });
-        this.$on('html-update', this.setLogic.bind(this));
         this.profileEditModal = new Modal({
             data: {
                 title: 'Профиль',
@@ -50,8 +49,8 @@ export default class Sidebar extends Component {
                             { label: 'Новый пароль', type: 'password', name: 'newPassword' },
                             { label: 'Подтвердите пароль', type: 'password', name: 'newPassword2' }
                         ]
-                        this.$find(`#${this.$uid}-fieldset-avatar input[type=file]`).addEventListener('change',(event:any) => {
-                            this.$find(`#${this.$uid}-fieldset-avatar img`).setAttribute('src',URL.createObjectURL(event.target.files[0]));
+                        this.$find(`#${this.$uid}-fieldset-avatar input[type=file]`)?.addEventListener('change',(event:any) => {
+                            this.$find(`#${this.$uid}-fieldset-avatar img`)?.setAttribute('src',URL.createObjectURL(event.target.files[0]));
                         })
                     },500)
                 }
@@ -113,10 +112,19 @@ export default class Sidebar extends Component {
                 }
             }
         });
+        this.$addHelper('if_filtred', function (this:any, fn:string, sn:string, srch:string, opts:any) {
+            if (!srch || srch.length === 0) {
+                return opts.fn(this);
+            } else if (`${fn} ${sn}`.indexOf(srch) >= 0) {
+                return opts.fn(this);
+            } else {
+                return opts.inverse(this);
+            }
+        });
     }
 
     private profileEditModal:Modal;
-    private activate (id:number|string) {
+    private activate (id:number) {
         this.data.chats = (<obj[]> this.data.chats).map((ch:obj) => {
             return { ...ch,active: (ch.id === id) }
         })
@@ -131,17 +139,13 @@ export default class Sidebar extends Component {
         this.profileEditModal.$open()
     }
 
-    private setLogic () {
-        this.$find(`#${this.$uid}-search-form`)?.addEventListener('submit',this.onSearch.bind(this));
-        this.$find(`#${this.$uid}-profile-btn`)?.addEventListener('click',this.openProfile.bind(this));
-        (<obj[]> this.data.chats).forEach((ch:obj) => {
-            if (!this.data.chatSearch || (<string> this.data.chatSearch).length === 0 || (<string>ch.title).indexOf(<string> this.data.chatSearch) >= 0) {
-                this.$find(`#${this.$uid}-chat-${ch.id}`)?.addEventListener('click',() => {
-                    this.activate(<number|string>ch.id);
-                    this.$emit('chat-open',ch.id)
-                })
-            }
-        })
+    private chatSelect (event:Event) {
+        const target = (<HTMLElement>event.target).closest('.chat-item');
+        if (target !== null) {
+            const chId = Number(target.getAttribute('chat-id'));
+            this.activate(chId);
+            this.$emit('chat-open',chId)
+        }
     }
 
     private editProfile (result:boolean,fvalues?:obj|undefined) {

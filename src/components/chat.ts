@@ -1,9 +1,10 @@
 import Component from '../components/component';
+import Modal from './modal';
 const chatTemplate:string = `
 <header class="chat-header">
-<a aria-label="Информация о собеседнике" id="profile-info-btn" style="display:flex;">
-    <img alt="Аватар собеседника" class="chat-image" src="{{url_img}}"/>
-    <b style="align-self: center;font-size:18px">{{title}}</b>
+<a aria-label="Информация о собеседнике" id="profile-info" style="display:flex;" {{on 'click' 'openProfileInfo' '#profile-info'}}>
+    <img alt="Аватар собеседника" class="chat-image" src="{{avatar}}"/>
+    <b style="align-self: center;font-size:18px">{{first_name}} {{second_name}}</b>
 </a>
 </header>
 <main id="{{uid}}-message-list" class="chat-messages">
@@ -32,9 +33,12 @@ const chatTemplate:string = `
         <img alt="{{alt}}" src="{{url}}"/>
     {{/images}}
     </div>
-    <form id="{{uid}}-message-form" class="inline">
-        <textarea name="message" placeholder="Сообщение">{{message}}</textarea>
-        <label class="image-files">&equiv;<input name="images" type="file" multiple accept="image/*"/></label>
+    <form id="message-form" class="inline" {{on 'submit' 'sendMessage' '#message-form'}}>
+        <textarea {{on 'input' 'onInput' '#message-form>textarea'}} name="message" placeholder="Сообщение">{{message}}</textarea>
+        <label class="image-files">
+            &equiv;
+            <input id="file-images" {{on 'change' 'addFile' '#file-images'}} name="images" type="file" multiple accept="image/*"/>
+        </label>
         <input type="submit" disabled value="Отправить"/>
     </form>
 </footer>`;
@@ -64,11 +68,25 @@ export default class Chat extends Component {
     constructor () {
         super(chatTemplate,'div',{ props: { className: 'chat-box' } });
         this.$on('open',this.load)
-        this.$on('html-update', this.setLogic.bind(this));
+        this.$on('html-update', this.scrollEnd.bind(this));
+        this.profileInfoModal = new Modal({
+            data: {
+                title: 'Профиль',
+                readonly: true,
+                fields: [],
+                ok_title: 'Сохранить',
+                cancel_title: 'Отмена'
+            }
+        });
     }
 
     private messages: obj[] = [];
     private message: string = '';
+    private profileInfoModal: Modal;
+    private openProfileInfo () {
+        this.profileInfoModal.$open();
+    }
+
     private fileToBase64 (files:FileList) {
         return new Promise<obj[]>((resolve) => {
             const images:obj[] = [];
@@ -117,29 +135,26 @@ export default class Chat extends Component {
         })
     }
 
+    private onInput (event:Event) {
+        const msg:string = (<HTMLTextAreaElement>event.target).value;
+        if (this.message !== msg) { this.message = msg; }
+        // message validation
+        (<HTMLInputElement> this.$find('#message-form>input[type=submit]')).disabled = (msg.length === 0);
+    }
+
+    private addFile (event:Event) {
+        this.fileToBase64(<FileList>(<any>event.target).files).then((images:obj[]) => {
+            Object.assign(this.data,{ images,message: this.message });
+            // message validation
+            (<HTMLInputElement> this.$find('#message-form>input[type=submit]')).disabled = (this.message.length === 0);
+        })
+    }
+
     private scrollEnd () {
         const el = this.$find(`#${this.$uid}-message-list`);
         if (el !== null) {
             el.scrollTo(0,el.scrollHeight);
         }
-    }
-
-    private setLogic () {
-        this.$find(`#${this.$uid}-message-form`)?.addEventListener('submit',this.sendMessage.bind(this));
-        this.$find(`#${this.$uid}-message-form input[type=file]`)?.addEventListener('change',(event:Event) => {
-            console.log(this.data);
-            this.fileToBase64(<FileList>(<any>event.target).files).then((images:obj[]) => {
-                Object.assign(this.data,{ images,message: this.message });
-                (<HTMLInputElement> this.$find(`#${this.$uid}-message-form input[type=submit]`)).disabled = (this.message.length === 0);
-            })
-        });
-        this.$find(`#${this.$uid}-message-form > textarea`)?.addEventListener('input',(event:Event) => {
-            const msg:string = (<HTMLTextAreaElement>event.target).value;
-            if (this.message !== msg) { this.message = msg; }
-            // message validation
-            (<HTMLInputElement> this.$find(`#${this.$uid}-message-form input[type=submit]`)).disabled = (msg.length === 0);
-        });
-        this.scrollEnd();
     }
 
     private load (chat: obj) {
@@ -170,6 +185,18 @@ export default class Chat extends Component {
                     this.data.messages = target;
                     return true;
                 }
+            })
+            this.profileInfoModal.$on('open', () => {
+                this.profileInfoModal.data.fields = [];
+                setTimeout(() => {
+                    this.profileInfoModal.data.fields = [
+                        { label: 'Аватар', type: 'avatar', name: 'avatar', value: this.data.avatar },
+                        { label: 'Имя', type: 'text', name: 'first_name', value: this.data.first_name },
+                        { label: 'Фамилия', type: 'text', name: 'second_name', value: this.data.second_name },
+                        { label: 'Email', type: 'email', name: 'email', value: this.data.email },
+                        { label: 'Телефон', type: 'tel', name: 'phone', value: this.data.phone }
+                    ]
+                },500)
             })
             Object.assign(this.messages,msgs);
         },500)

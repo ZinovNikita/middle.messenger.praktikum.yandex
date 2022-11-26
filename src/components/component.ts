@@ -1,4 +1,4 @@
-import Handlebars from 'handlebars';
+import Handlebars, { HelperDelegate } from 'handlebars';
 export default class Component extends EventTarget {
     constructor (template:string, tagName:string = 'div', options?:ComponentOptionsType) {
         super();
@@ -38,12 +38,25 @@ export default class Component extends EventTarget {
         for (const k in this.events) {
             this.$on(k,this.events[k as keyof obj]);
         }
+        this.$on('html-update', this.eventsBuild.bind(this))
     }
 
     private element: Element;
     private template: string;
-    private event_list: objevent = {};
+    private eventList: objevent = {};
+    private elementEvents: obj[] = [];
     private uid: string;
+
+    private eventsBuild () {
+        this.elementEvents.forEach((o:obj) => {
+            const el = this.$find(o.selector as string);
+            const f = this[o.funcName as keyof this];
+            if (el !== null && typeof f === 'function') {
+                el.addEventListener(o.name as string, f.bind(this) as EventListenerOrEventListenerObject);
+            }
+        })
+    }
+
     public attrs: obj = {};
     public props: obj = {};
     public data: obj = {};
@@ -59,14 +72,14 @@ export default class Component extends EventTarget {
 
     public $title: string = '';
     public $compile (data:obj) {
-        Handlebars.registerHelper('if_eq', function (this:any, a:any, b:any, opts:any) {
+        this.$addHelper('if_eq', function (this:any, a:any, b:any, opts:any) {
             if (a === b) {
                 return opts.fn(this);
             } else {
                 return opts.inverse(this);
             }
         });
-        Handlebars.registerHelper('if_include', function (this:any, a:any, b:any, opts:any) {
+        this.$addHelper('if_include', function (this:any, a:any, b:any, opts:any) {
             if (b === null || b === undefined || (typeof b === 'string' && b.length === 0)) { return opts.fn(this); }
             if (a.indexOf(b) >= 0) {
                 return opts.fn(this);
@@ -74,13 +87,21 @@ export default class Component extends EventTarget {
                 return opts.inverse(this);
             }
         });
+        this.$addHelper('on', (name:string, funcName:string, selector:string) => {
+            if (this.elementEvents.filter((o:obj) => { return (o.selector === selector && o.name === name && o.funcName === funcName) }).length === 0) {
+                this.elementEvents.push({ selector, name, funcName })
+            }
+            return '';
+        });
         return Handlebars.compile(this.template).call(this,data);
     }
 
-    public $find (selector:string):Element {
-        const tmp = this.$el.querySelector(selector);
-        if (tmp === null) { throw new Error(`Элемент ${selector} не найден`); }
-        return tmp;
+    public $addHelper (name:string,cb:HelperDelegate) {
+        Handlebars.registerHelper(name, cb);
+    }
+
+    public $find (selector:string):Element|null {
+        return this.$el.querySelector(selector);
     }
 
     public $findAll (selector:string) {
@@ -88,20 +109,20 @@ export default class Component extends EventTarget {
     }
 
     public $on (type:string,callback:Function):void {
-        if (!Array.isArray(this.event_list[type])) { this.event_list[type] = []; }
-        this.event_list[type].push((event:Event) => {
+        if (!Array.isArray(this.eventList[type])) { this.eventList[type] = []; }
+        this.eventList[type].push((event:Event) => {
             callback.call(this,...(<CustomEvent>event).detail);
         });
-        this.addEventListener(type,this.event_list[type][this.event_list[type].length - 1]);
+        this.addEventListener(type,this.eventList[type][this.eventList[type].length - 1]);
     }
 
     public $off (type:string):void {
-        if (Array.isArray(this.event_list[type])) {
-            this.event_list[type].forEach(e => {
+        if (Array.isArray(this.eventList[type])) {
+            this.eventList[type].forEach(e => {
                 this.removeEventListener(type,e)
             })
         }
-        delete this.event_list[type];
+        delete this.eventList[type];
     }
 
     public $emit (type:string,...args:unknown[]):void {

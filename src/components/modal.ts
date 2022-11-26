@@ -6,7 +6,7 @@ const modalTemplate:string = `
 </header>
 <form id="{{uid}}-form" data-obj-type="modal-form">
 {{#fields}}
-    {{#if readonly}}
+    {{#if ../readonly}}
         {{#if_eq type 'avatar'}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label class="avatar-image">
@@ -56,13 +56,16 @@ export default class Modal extends Component {
         (<obj[]> this.data.fields).forEach((f:obj) => {
             this.fvalues[f.name as keyof obj] = f.value;
         })
-        this.$find(`#${this.$uid}-form`)?.addEventListener('input',this.onInput.bind(this))
+        this.$find(`#${this.$uid}-form`)?.addEventListener('focusin',this.onFocus.bind(this))
+        this.$find(`#${this.$uid}-form`)?.addEventListener('focusout',this.onFocus.bind(this))
+        this.$find(`#${this.$uid}-form`)?.addEventListener('focus',this.onFocus.bind(this))
+        this.$find(`#${this.$uid}-form`)?.addEventListener('blur',this.onFocus.bind(this))
         this.$find(`#${this.$uid}-ok[data-obj-type=ok-btn]`)?.addEventListener('click',this.onOk.bind(this))
         this.$find(`#${this.$uid}-cancel[data-obj-type=cancel-btn]`)?.addEventListener('click',this.onCancel.bind(this))
         this.$find(`#${this.$uid}-close`)?.addEventListener('click',this.onClose.bind(this))
     }
 
-    private onInput (event:any) {
+    private onFocus (event:any) {
         this.fvalues[event.target.name] = event.target.value;
         this.$emit('input',event.target.name,event.target.value);
         this.$is_valid(event.target.name);
@@ -88,7 +91,8 @@ export default class Modal extends Component {
     }
 
     public $field_error (key:string,msg:string = '') {
-        this.$find(`#${this.$uid}-fieldset-${key}>.error-msg`).textContent = msg;
+        const tmp = this.$find(`#${this.$uid}-fieldset-${key}>.error-msg`);
+        if (tmp !== null) { tmp.textContent = msg; }
     }
 
     public $is_valid (key:string|undefined = undefined):Promise<boolean> {
