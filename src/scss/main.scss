@@ -142,13 +142,12 @@ $placeholder-color: #ddd;
         }
 
         > .chat-messages {
-            flex: 1 1 auto;
             align-self: stretch;
             overflow-x: hidden;
             overflow-y: auto;
             display: flex;
             flex-flow: column nowrap;
-            justify-content: flex-end;
+            margin-top: auto;
 
             > .message-block {
                 display: flex;

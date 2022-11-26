@@ -12,6 +12,7 @@
 <script type="module" src="../app.ts"></script>
 <script>
 document.addEventListener("appMounted",(event)=>{
+    event.detail.$route('index');
     event.detail.$route('signin');
 })
 </script>

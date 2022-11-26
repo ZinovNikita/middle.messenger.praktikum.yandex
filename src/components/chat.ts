@@ -6,7 +6,7 @@ const chatTemplate:string = `
     <b style="align-self: center;font-size:18px">{{title}}</b>
 </a>
 </header>
-<main class="chat-messages">
+<main id="{{uid}}-message-list" class="chat-messages">
 {{#messages}}
     {{#if my}}
     <article class="message-block right">
@@ -117,12 +117,20 @@ export default class Chat extends Component {
         })
     }
 
+    private scrollEnd () {
+        let el = this.$find(`#${this.$uid}-message-list`);
+        if(el!==null){
+            el.scrollTo(0,el.scrollHeight);
+        }
+    }
+
     private setLogic () {
         this.$find(`#${this.$uid}-message-form`)?.addEventListener('submit',this.sendMessage.bind(this));
         this.$find(`#${this.$uid}-message-form input[type=file]`)?.addEventListener('change',(event:Event) => {
             console.log(this.data);
             this.fileToBase64(<FileList>(<any>event.target).files).then((images:obj[]) => {
-                Object.assign(this.data,{ images,message: this.message })
+                Object.assign(this.data,{ images,message: this.message });
+                (<HTMLInputElement> this.$find(`#${this.$uid}-message-form input[type=submit]`)).disabled = (this.message.length === 0);
             })
         });
         this.$find(`#${this.$uid}-message-form > textarea`)?.addEventListener('input',(event:Event) => {
@@ -131,6 +139,7 @@ export default class Chat extends Component {
             // message validation
             (<HTMLInputElement> this.$find(`#${this.$uid}-message-form input[type=submit]`)).disabled = (msg.length === 0);
         });
+        this.scrollEnd();
     }
 
     private load (chat: obj) {
