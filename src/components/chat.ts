@@ -69,16 +69,16 @@ export default class Chat extends Component {
         super(chatTemplate,'div',{
             props: { className: 'chat-box' },
             events: {
-                'html-update': ()=> {
+                'html-update': () => {
                     this.$emit('scrollEnd');
                 },
-                scrollEnd: ()=> {
+                scrollEnd: () => {
                     const el = this.$find(`#${this.$uid}-message-list`);
                     if (el !== null) {
                         el.scrollTo(0,el.scrollHeight);
                     }
                 },
-                open:(chat: Obj)=> {
+                open: (chat: Obj) => {
                     this.$el.innerHTML = '';
                     this.message = '';
                     Object.assign(this.data, chat);

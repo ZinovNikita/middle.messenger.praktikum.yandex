@@ -20,7 +20,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
                 return true;
             }
         })
-        this.eventBus.$on('html-update', ()=>this.eventsBuild())
+        this.eventBus.$on('html-update', () => this.eventsBuild())
         this.data = new Proxy({},{
             set: (target:any, prop:string, val: any) => {
                 target[prop] = val;

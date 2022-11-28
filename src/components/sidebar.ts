@@ -34,11 +34,11 @@ export default class Sidebar extends Component {
                 cancel_title: 'Отмена'
             },
             events: {
-                done: (result:boolean,fvalues?:Obj|undefined)=> {
+                done: (result:boolean,fvalues?:Obj|undefined) => {
                     // update profile on server
                     console.log('Профиль',result,fvalues);
                 },
-                open: ()=> {
+                open: () => {
                     this.profileEditModal.data.fields = [];
                     setTimeout(() => {
                         this.profileEditModal.data.fields = [
