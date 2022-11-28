@@ -2,9 +2,14 @@ import Component from './component';
 const modalTemplate:string = `
 <header class="modal-title">
     <h3>{{title}}</h3>
-    <i id="{{uid}}-close" class="modal-close">&times;</i>
+    <i id="{{uid}}-close" class="modal-close"
+        {{on 'click' 'onClose' 'i.modal-close'}}>&times;</i>
 </header>
-<form id="{{uid}}-form" data-obj-type="modal-form">
+<form id="{{uid}}-form" data-obj-type="modal-form"
+    {{on 'focusin' 'onFocus' 'form[data-obj-type="modal-form"]'}}
+    {{on 'focusout' 'onFocus' 'form[data-obj-type="modal-form"]'}}
+    {{on 'blur' 'onFocus' 'form[data-obj-type="modal-form"]'}}
+    {{on 'focus' 'onFocus' 'form[data-obj-type="modal-form"]'}}>
 {{#fields}}
     {{#if ../readonly}}
         {{#if_eq type 'avatar'}}
@@ -32,7 +37,8 @@ const modalTemplate:string = `
         {{else}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
-            <input data-obj-type="field" type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"/>
+            <input data-obj-type="file-avatar" type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"
+                {{on 'change' 'onSelectAvatar' 'input[data-obj-type="file-avatar"]'}}/>
             <small class="error-msg"></small>
         </fieldset>
         {{/if_eq}}
@@ -40,42 +46,41 @@ const modalTemplate:string = `
 {{/fields}}
 </form>
 <footer class="modal-footer">
-    <button id="{{uid}}-cancel" class="btn-red" data-obj-type="cancel-btn">{{cancel_title}}</button>
-    <button id="{{uid}}-ok" data-obj-type="ok-btn">{{ok_title}}</button>
+    <button id="{{uid}}-cancel" class="btn-red" data-obj-type="cancel-btn"
+        {{on 'click' 'onCancel' 'button[data-obj-type="cancel-btn"]'}}>{{cancel_title}}</button>
+    <button id="{{uid}}-ok" data-obj-type="ok-btn"
+        {{on 'click' 'onOk' 'button[data-obj-type="ok-btn"]'}}>{{ok_title}}</button>
 </footer>`;
 export default class Modal extends Component {
-    constructor (options?:ComponentOptionsType) {
-        super(modalTemplate,'dialog',options);
+    constructor (options:ComponentOptionsType) {
+        if (!options.events) { options.events = {}; }
+        options.events['html-update'] = function (this:Modal) {
+            (<Obj[]> this.data.fields).forEach((f:Obj) => {
+                this.fvalues[f.name as keyof Obj] = f.value;
+            })
+            this.$emit('mounted');
+        }
+        super(modalTemplate,'dialog', options);
         this.props.className = 'modal';
-        this.$on('html-update',this.onMount.bind(this));
-        this.onMount()
+        this.$emit('html-update');
     }
 
-    private fvalues: obj = {};
-    private onMount () {
-        (<obj[]> this.data.fields).forEach((f:obj) => {
-            this.fvalues[f.name as keyof obj] = f.value;
-        })
-        this.$find(`#${this.$uid}-form`)?.addEventListener('focusin',this.onFocus.bind(this))
-        this.$find(`#${this.$uid}-form`)?.addEventListener('focusout',this.onFocus.bind(this))
-        this.$find(`#${this.$uid}-form`)?.addEventListener('focus',this.onFocus.bind(this))
-        this.$find(`#${this.$uid}-form`)?.addEventListener('blur',this.onFocus.bind(this))
-        this.$find(`#${this.$uid}-ok[data-obj-type=ok-btn]`)?.addEventListener('click',this.onOk.bind(this))
-        this.$find(`#${this.$uid}-cancel[data-obj-type=cancel-btn]`)?.addEventListener('click',this.onCancel.bind(this))
-        this.$find(`#${this.$uid}-close`)?.addEventListener('click',this.onClose.bind(this))
-    }
+    private fvalues: Obj = {};
 
+    // @ts-ignore - used after template compilation from element events
     private onFocus (event:any) {
         this.fvalues[event.target.name] = event.target.value;
         this.$emit('input',event.target.name,event.target.value);
         this.$is_valid(event.target.name);
     }
 
+    // @ts-ignore - used after template compilation from element events
     private onCancel () {
         this.$emit('cancel');
         this.$close(false)
     }
 
+    // @ts-ignore - used after template compilation from element events
     private onOk () {
         this.$is_valid().then((success:boolean) => {
             if (success === true) {
@@ -85,9 +90,15 @@ export default class Modal extends Component {
         })
     }
 
+    // @ts-ignore - used after template compilation from element events
     private onClose () {
         (<any> this.$el).close();
         this.$el.remove();
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private onSelectAvatar (event:any) {
+        this.$emit('select-avatar',event)
     }
 
     public $field_error (key:string,msg:string = '') {

@@ -10,7 +10,7 @@ class Fetch2 {
         return `?${str.join('&')}`;
     }
 
-    public $get (url:string, options:fetch2OptionsType) {
+    public $get (url:string, options:Fetch2OptionsType) {
         options = Object.assign({ method: 'GET',timeout: 5000 },options);
         options.method = 'GET';
         if (typeof options.params === 'object') {
@@ -20,7 +20,7 @@ class Fetch2 {
         return this.$request(url, options);
     }
 
-    public $post (url:string, options:fetch2OptionsType) {
+    public $post (url:string, options:Fetch2OptionsType) {
         options = Object.assign({ method: 'POST',timeout: 5000 },options);
         options.method = 'POST';
         if (typeof options.params === 'object') {
@@ -30,7 +30,7 @@ class Fetch2 {
         return this.$request(url, options);
     }
 
-    public $put (url:string, options:fetch2OptionsType) {
+    public $put (url:string, options:Fetch2OptionsType) {
         options = Object.assign({ method: 'PUT',timeout: 5000 },options);
         options.method = 'PUT';
         if (typeof options.params === 'object') {
@@ -40,7 +40,7 @@ class Fetch2 {
         return this.$request(url, options);
     }
 
-    public $delete (url:string, options:fetch2OptionsType) {
+    public $delete (url:string, options:Fetch2OptionsType) {
         options = Object.assign({ method: 'DELETE',timeout: 5000 },options);
         options.method = 'DELETE';
         if (typeof options.params === 'object') {
@@ -50,7 +50,7 @@ class Fetch2 {
         return this.$request(url, options);
     };
 
-    public $request (url:string, options:fetch2OptionsType) {
+    public $request (url:string, options:Fetch2OptionsType) {
         options = Object.assign({ method: 'GET',timeout: 5000 },options);
         return new Promise(function (resolve, reject) {
             try {
@@ -80,5 +80,5 @@ class Fetch2 {
         });
     }
 }
-const fetch2:fetch2Type = new Fetch2();
+const fetch2:Fetch2Type = new Fetch2();
 export default fetch2;
