@@ -19,9 +19,6 @@ declare type ComponentType = {
     $find: Function,
     $findAll: Function,
     $title: string,
-    $on: Function,
-    $off: Function,
-    $emit: Function,
     $attach: Function,
     $el:Element,
     $uid:string,
@@ -34,10 +31,16 @@ declare type Fetch2OptionsType = {
     params?: Obj,
     body?: Document|XMLHttpRequestBodyInit|undefined,
 }
+declare type Fetch2MethodType = (url:string, options:Fetch2OptionsType) => Promise<unknown>
 declare type Fetch2Type = {
-    $get: Function,
-    $post: Function,
-    $put: Function,
-    $delete: Function,
-    $request: Function
+    $get: Fetch2MethodType,
+    $post: Fetch2MethodType,
+    $put: Fetch2MethodType,
+    $delete: Fetch2MethodType,
+    $request: Fetch2MethodType
+}
+declare type EventBus = {
+    $on: Function,
+    $off: Function,
+    $emit: Function,
 }

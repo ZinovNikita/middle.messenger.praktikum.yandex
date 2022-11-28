@@ -29,7 +29,8 @@ const modalTemplate:string = `
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
             <label class="avatar-image">
-                <input data-obj-type="field" type="file" accept="image/*" name="{{name}}"/>
+                <input data-obj-type="file-avatar" type="file" accept="image/*" name="{{name}}"
+                    {{on 'change' 'onSelectAvatar' 'input[data-obj-type="file-avatar"]'}}/>
                 <img data-obj-type="image" src="{{value}}"/>
             </label>
             <small class="error-msg"></small>
@@ -37,8 +38,7 @@ const modalTemplate:string = `
         {{else}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
-            <input data-obj-type="file-avatar" type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"
-                {{on 'change' 'onSelectAvatar' 'input[data-obj-type="file-avatar"]'}}/>
+            <input data-obj-type="field" type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"/>
             <small class="error-msg"></small>
         </fieldset>
         {{/if_eq}}
@@ -54,13 +54,14 @@ const modalTemplate:string = `
 export default class Modal extends Component {
     constructor (options:ComponentOptionsType) {
         if (!options.events) { options.events = {}; }
-        options.events['html-update'] = function (this:Modal) {
+        options.events['html-update'] = () => {
             (<Obj[]> this.data.fields).forEach((f:Obj) => {
                 this.fvalues[f.name as keyof Obj] = f.value;
             })
             this.$emit('mounted');
         }
         super(modalTemplate,'dialog', options);
+        (<HTMLDialogElement> this.$el).close();
         this.props.className = 'modal';
         this.$emit('html-update');
     }
@@ -98,7 +99,7 @@ export default class Modal extends Component {
 
     // @ts-ignore - used after template compilation from element events
     private onSelectAvatar (event:any) {
-        this.$emit('select-avatar',event)
+        this.$emit('select-avatar',event.target.files)
     }
 
     public $field_error (key:string,msg:string = '') {
@@ -117,12 +118,12 @@ export default class Modal extends Component {
 
     public $open () {
         this.$attach(document.body);
-        (<any> this.$el).showModal();
+        (<HTMLDialogElement> this.$el).showModal();
         this.$emit('open');
     }
 
     public $close (result:boolean = false) {
-        (<any> this.$el).close();
+        (<HTMLDialogElement> this.$el).close();
         this.$el.remove();
         if (result) { this.$emit('done',true,this.fvalues); } else { this.$emit('done',false); }
     }

@@ -69,13 +69,16 @@ export default class Chat extends Component {
         super(chatTemplate,'div',{
             props: { className: 'chat-box' },
             events: {
-                'html-update': function (this: Chat) {
+                'html-update': ()=> {
+                    this.$emit('scrollEnd');
+                },
+                scrollEnd: ()=> {
                     const el = this.$find(`#${this.$uid}-message-list`);
                     if (el !== null) {
                         el.scrollTo(0,el.scrollHeight);
                     }
                 },
-                open (this: Chat,chat: Obj) {
+                open:(chat: Obj)=> {
                     this.$el.innerHTML = '';
                     this.message = '';
                     Object.assign(this.data, chat);
@@ -118,7 +121,7 @@ export default class Chat extends Component {
                 cancel_title: 'Отмена'
             },
             events: {
-                open (this: Chat) {
+                open: () => {
                     this.profileInfoModal.data.fields = [];
                     setTimeout(() => {
                         this.profileInfoModal.data.fields = [
@@ -187,7 +190,9 @@ export default class Chat extends Component {
                 my: true
             })
             this.data.images = [];
+            this.message = '';
             this.data.message = '';
+            this.$emit('scrollEnd');
         })
     }
 
@@ -202,7 +207,7 @@ export default class Chat extends Component {
     // @ts-ignore - used after template compilation from element events
     private addFile (event:Event) {
         this.fileToBase64(<FileList>(<any>event.target).files).then((images:Obj[]) => {
-            Object.assign(this.data,{ images,message: this.message });
+            Object.assign(this.data,{ images, message: this.message });
             // message validation
             (<HTMLInputElement> this.$find('#message-form>input[type=submit]')).disabled = (this.message.length === 0);
         })

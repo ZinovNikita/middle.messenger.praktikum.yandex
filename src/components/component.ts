@@ -1,7 +1,7 @@
 import Handlebars, { HelperDelegate } from 'handlebars';
-export default class Component extends EventTarget {
-    constructor (template:string, tagName:string = 'div', options?:ComponentOptionsType) {
-        super();
+import EventBus from './event_bus';
+export default class Component<T extends ComponentOptionsType = {}> {
+    constructor (template:string, tagName:string = 'div', options:T) {
         this.element = document.createElement(tagName);
         this.uid = `uid_${Math.floor(new Date().getTime() * (Math.random() * 100)).toString(16)}`;
         this.template = template;
@@ -20,6 +20,7 @@ export default class Component extends EventTarget {
                 return true;
             }
         })
+        this.eventBus.$on('html-update', ()=>this.eventsBuild())
         this.data = new Proxy({},{
             set: (target:any, prop:string, val: any) => {
                 target[prop] = val;
@@ -28,34 +29,45 @@ export default class Component extends EventTarget {
                 return true;
             }
         })
-        Object.assign(this.attrs, options?.attrs);
-        Object.assign(this.props, options?.props);
-        Object.assign(this.data, options?.data);
-        Object.assign(this.events, options?.events);
-        Object.assign(this.methods, options?.methods);
+        Object.assign(this.attrs, options.attrs);
+        Object.assign(this.props, options.props);
+        Object.assign(this.data, options.data);
+        Object.assign(this.events, options.events);
+        Object.assign(this.methods, options.methods);
         this.props.id = this.uid;
         this.data.uid = this.uid;
         for (const k in this.events) {
-            this.$on(k, this.events[k as keyof Obj]);
+            this.eventBus.$on(k, this.events[k as keyof Obj]);
         }
-        this.$on('html-update', this.eventsBuild)
     }
 
     private element: Element;
     private template: string;
-    private eventList: ObjEvent = {};
+    private eventBus: EventBus = new EventBus();
     private elementEvents: Obj[] = [];
     private uid: string;
 
     private eventsBuild () {
         this.elementEvents.forEach((o:Obj) => {
             const el = this.$find(o.selector as string);
-            const f = this[o.funcName as keyof this];
-            if (el !== null && typeof f === 'function') {
-                // bind used to set context of Component class, and not element from which event is called
-                el.addEventListener(o.name as string, f.bind(this));
+            if (el !== null) {
+                this.eventBus.$off(`sub.${o.selector}.${o.name}`);
+                this.eventBus.$on(`sub.${o.selector}.${o.name}`,(event:Event) => {
+                    if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event) }
+                })
+                el.addEventListener(o.name as string, (event:Event) => {
+                    this.$emit(`sub.${o.selector}.${o.name}`,event);
+                });
             }
         })
+    }
+
+    public $off (type:string):void {
+        this.eventBus.$off(type);
+    }
+
+    public $emit (type:string,...args:any[]):void {
+        this.eventBus.$emit(type,...args);
     }
 
     public attrs: Obj = {};
@@ -107,29 +119,6 @@ export default class Component extends EventTarget {
 
     public $findAll (selector:string) {
         return this.$el.querySelectorAll(selector);
-    }
-
-    public $on (type:string,callback:Function):void {
-        if (!Array.isArray(this.eventList[type])) { this.eventList[type] = []; }
-        this.eventList[type].push((event:Event) => {
-            callback.call(this,...(<CustomEvent>event).detail);
-        });
-        this.addEventListener(type,this.eventList[type][this.eventList[type].length - 1]);
-    }
-
-    public $off (type:string):void {
-        if (Array.isArray(this.eventList[type])) {
-            this.eventList[type].forEach((e:EventListenerOrEventListenerObject|null) => {
-                this.removeEventListener(type,e)
-            })
-        }
-        delete this.eventList[type];
-    }
-
-    public $emit (type:string,...args:unknown[]):void {
-        this.dispatchEvent(new CustomEvent(type,{
-            detail: args
-        }))
     }
 
     public $attach (el: Element) {
