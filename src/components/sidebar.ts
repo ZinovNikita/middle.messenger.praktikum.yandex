@@ -34,14 +34,14 @@ export default class Sidebar extends Component {
                 cancel_title: 'Отмена'
             },
             events: {
-                done (this:Modal, result:boolean,fvalues?:Obj|undefined) {
+                done: (result:boolean,fvalues?:Obj|undefined) => {
                     // update profile on server
                     console.log('Профиль',result,fvalues);
                 },
-                open (this:Modal) {
-                    this.data.fields = [];
+                open: () => {
+                    this.profileEditModal.data.fields = [];
                     setTimeout(() => {
-                        this.data.fields = [
+                        this.profileEditModal.data.fields = [
                             { label: 'Аватар', type: 'avatar', name: 'avatar', value: 'https://thispersondoesnotexist.com/image?q=0' },
                             { label: 'Имя', type: 'text', name: 'first_name', value: 'Никита' },
                             { label: 'Фамилия', type: 'text', name: 'second_name', value: 'Зинов' },
@@ -54,8 +54,8 @@ export default class Sidebar extends Component {
                         ]
                     },500)
                 },
-                'select-avatar': function (this:Modal,event:any) {
-                    this.$find(`#${this.$uid}-fieldset-avatar img`)?.setAttribute('src',URL.createObjectURL(event.target.files[0]));
+                'select-avatar': (files:FileList) => {
+                    this.profileEditModal.$find(`#${this.profileEditModal.$uid}-fieldset-avatar img`)?.setAttribute('src',URL.createObjectURL(files[0]));
                 }
             },
             methods: {

@@ -132,7 +132,8 @@ $placeholder-color: #ddd;
             }
 
             .chat-input-images {
-                margin-bottom: 10px;
+                margin-top: -110px;
+                position: absolute;
 
                 img {
                     max-height: 100px;

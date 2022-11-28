@@ -13,9 +13,6 @@ class Application {
         if (tmp === null) { throw new Error(`Элемент приложения ${selector} не найден`); }
         this.element = tmp;
         this.pages = pages;
-        for (const k in this.pages) {
-            this.pages[k as keyof ObjComponentType].$on('route', this.route);
-        }
         this.signInForm = new Modal({
             data: {
                 title: 'Вход',
