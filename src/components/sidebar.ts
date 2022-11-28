@@ -23,8 +23,8 @@ const sidebarTemplate:string = `
 {{/chats}}
 </ul>`;
 export default class Sidebar extends Component {
-    constructor (chats:obj[]) {
-        super(sidebarTemplate,'nav',{ props: { className: 'sidebar' },data: { chats } });
+    constructor (chats:Obj[], events:ObjFunc = {}) {
+        super(sidebarTemplate,'nav',{ props: { className: 'sidebar' },data: { chats }, events });
         this.profileEditModal = new Modal({
             data: {
                 title: 'Профиль',
@@ -34,7 +34,10 @@ export default class Sidebar extends Component {
                 cancel_title: 'Отмена'
             },
             events: {
-                done: this.editProfile.bind(this),
+                done (this:Modal, result:boolean,fvalues?:Obj|undefined) {
+                    // update profile on server
+                    console.log('Профиль',result,fvalues);
+                },
                 open (this:Modal) {
                     this.data.fields = [];
                     setTimeout(() => {
@@ -49,10 +52,10 @@ export default class Sidebar extends Component {
                             { label: 'Новый пароль', type: 'password', name: 'newPassword' },
                             { label: 'Подтвердите пароль', type: 'password', name: 'newPassword2' }
                         ]
-                        this.$find(`#${this.$uid}-fieldset-avatar input[type=file]`)?.addEventListener('change',(event:any) => {
-                            this.$find(`#${this.$uid}-fieldset-avatar img`)?.setAttribute('src',URL.createObjectURL(event.target.files[0]));
-                        })
                     },500)
+                },
+                'select-avatar': function (this:Modal,event:any) {
+                    this.$find(`#${this.$uid}-fieldset-avatar img`)?.setAttribute('src',URL.createObjectURL(event.target.files[0]));
                 }
             },
             methods: {
@@ -125,7 +128,7 @@ export default class Sidebar extends Component {
 
     private profileEditModal:Modal;
     private activate (id:number) {
-        this.data.chats = (<obj[]> this.data.chats).map((ch:obj) => {
+        this.data.chats = (<Obj[]> this.data.chats).map((ch:Obj) => {
             return { ...ch,active: (ch.id === id) }
         })
     }
@@ -149,10 +152,5 @@ export default class Sidebar extends Component {
             this.activate(chId);
             this.$emit('chat-open',chId)
         }
-    }
-
-    private editProfile (result:boolean,fvalues?:obj|undefined) {
-        // update profile on server
-        console.log('Профиль',result,fvalues);
     }
 }

@@ -11,6 +11,7 @@
         "dev": "parcel ./src/pages/*.html -p 3000 --no-cache --no-source-maps",
         "build": "parcel build ./src/pages/*.html --no-cache --no-source-maps",
         "lint": "eslint \"src/**/*.ts\" && stylelint \"src/**/*.scss\"",
+        "lint-fix": "eslint \"src/**/*.ts\" --fix && stylelint \"src/**/*.scss\" --fix",
         "start": "npm run build && node ./app.js"
     },
     "repository": {

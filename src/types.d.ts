@@ -1,20 +1,20 @@
 declare module 'handlebars/runtime';
-declare type obj = {[id:string]:(string|number|boolean|undefined|obj|Function|unknown|EventListenerOrEventListenerObject|null)}
-declare type objfunc = {[id:string]:Function}
-declare type objevent = {[id:string]:(EventListenerOrEventListenerObject|null)[]}
+declare type Obj = {[id:string]:(string|number|boolean|undefined|obj|Function|unknown|EventListenerOrEventListenerObject|null)}
+declare type ObjFunc = {[id:string]:Function}
+declare type ObjEvent = {[id:string]:(EventListenerOrEventListenerObject|null)[]}
 declare type ComponentOptionsType = {
-    attrs?: obj,
-    props?: obj,
-    data?: obj,
-    events?: objfunc,
-    methods?: objfunc,
+    attrs?: Obj,
+    props?: Obj,
+    data?: Obj,
+    events?: ObjFunc,
+    methods?: ObjFunc,
 }
 declare type ComponentType = {
-    attrs: obj,
-    props: obj,
-    data: obj,
-    events: objfunc,
-    methods: objfunc,
+    attrs: Obj,
+    props: Obj,
+    data: Obj,
+    events: ObjFunc,
+    methods: ObjFunc,
     $compile: Function,
     $find: Function,
     $findAll: Function,
@@ -26,15 +26,15 @@ declare type ComponentType = {
     $el:Element,
     $uid:string,
 }
-declare type objComponentType = {[id:string]:ComponentType}
-declare type fetch2OptionsType = {
+declare type ObjComponentType = {[id:string]:ComponentType}
+declare type Fetch2OptionsType = {
     method: string,
     timeout?: number,
-    headers?: {[id:string]:unknown},
-    params?: {[id:string]:unknown},
+    headers?: Obj,
+    params?: Obj,
     body?: Document|XMLHttpRequestBodyInit|undefined,
 }
-declare type fetch2Type = {
+declare type Fetch2Type = {
     $get: Function,
     $post: Function,
     $put: Function,

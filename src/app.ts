@@ -4,17 +4,17 @@ import ErrorPage from './views/error';
 import Modal from './components/modal';
 class Application {
     public $name:string = '';
-    private pages:objComponentType;
+    private pages:ObjComponentType;
     private element: Element;
     private signInForm: Modal;
     private signUpForm: Modal;
-    constructor (selector:string, name:string, pages:objComponentType) {
+    constructor (selector:string, name:string, pages:ObjComponentType) {
         const tmp = document.querySelector(selector);
         if (tmp === null) { throw new Error(`Элемент приложения ${selector} не найден`); }
         this.element = tmp;
         this.pages = pages;
         for (const k in this.pages) {
-            this.pages[k as keyof objComponentType].$on('route', this.route);
+            this.pages[k as keyof ObjComponentType].$on('route', this.route);
         }
         this.signInForm = new Modal({
             data: {

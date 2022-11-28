@@ -2,7 +2,7 @@ import Component from '../components/component';
 import Sidebar from '../components/sidebar';
 import Chat from '../components/chat';
 const chatsTemplate:string = '';
-const chats:obj[] = [{
+const chats:Obj[] = [{
     id: 1,
     first_name: 'Иван',
     second_name: 'Иванов',
@@ -21,11 +21,18 @@ const chats:obj[] = [{
 }];
 export default class Chats extends Component {
     constructor () {
-        super(chatsTemplate,'main',{ props: { className: 'container' } });
+        super(chatsTemplate,'main',{
+            props: { className: 'container' }
+        });
+
         this.$title = 'Чаты';
-        this.sidebar = new Sidebar(this.chats);
+        this.sidebar = new Sidebar(this.chats, {
+            'chat-open': (id:string|number) => {
+                this.chat.$emit('open', chats.find((ch:Obj) => { return ch.id === id }))
+                this.chat.$attach(this.$el)
+            }
+        });
         this.sidebar.$attach(this.$el);
-        this.sidebar.$on('chat-open',this.chatOpen.bind(this))
         this.chat = new Chat();
         this.chats = new Proxy(chats,{
             get: (target:any, prop:string) => {
@@ -43,9 +50,5 @@ export default class Chats extends Component {
 
     private sidebar:ComponentType;
     private chat:ComponentType;
-    private chats: obj[] = [];
-    private chatOpen (id:string|number) {
-        this.chat.$emit('open', chats.find((ch:obj) => { return ch.id === id }))
-        this.chat.$attach(this.$el)
-    }
+    private chats: Obj[] = [];
 }

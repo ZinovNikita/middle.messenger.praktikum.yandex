@@ -36,32 +36,33 @@ export default class Component extends EventTarget {
         this.props.id = this.uid;
         this.data.uid = this.uid;
         for (const k in this.events) {
-            this.$on(k,this.events[k as keyof obj]);
+            this.$on(k, this.events[k as keyof Obj]);
         }
-        this.$on('html-update', this.eventsBuild.bind(this))
+        this.$on('html-update', this.eventsBuild)
     }
 
     private element: Element;
     private template: string;
-    private eventList: objevent = {};
-    private elementEvents: obj[] = [];
+    private eventList: ObjEvent = {};
+    private elementEvents: Obj[] = [];
     private uid: string;
 
     private eventsBuild () {
-        this.elementEvents.forEach((o:obj) => {
+        this.elementEvents.forEach((o:Obj) => {
             const el = this.$find(o.selector as string);
             const f = this[o.funcName as keyof this];
             if (el !== null && typeof f === 'function') {
-                el.addEventListener(o.name as string, f.bind(this) as EventListenerOrEventListenerObject);
+                // bind used to set context of Component class, and not element from which event is called
+                el.addEventListener(o.name as string, f.bind(this));
             }
         })
     }
 
-    public attrs: obj = {};
-    public props: obj = {};
-    public data: obj = {};
-    public events: objfunc = {};
-    public methods: objfunc = {};
+    public attrs: Obj = {};
+    public props: Obj = {};
+    public data: Obj = {};
+    public events: ObjFunc = {};
+    public methods: ObjFunc = {};
     public get $el ():Element {
         return this.element;
     }
@@ -71,7 +72,7 @@ export default class Component extends EventTarget {
     }
 
     public $title: string = '';
-    public $compile (data:obj) {
+    public $compile (data:Obj) {
         this.$addHelper('if_eq', function (this:any, a:any, b:any, opts:any) {
             if (a === b) {
                 return opts.fn(this);
@@ -88,7 +89,7 @@ export default class Component extends EventTarget {
             }
         });
         this.$addHelper('on', (name:string, funcName:string, selector:string) => {
-            if (this.elementEvents.filter((o:obj) => { return (o.selector === selector && o.name === name && o.funcName === funcName) }).length === 0) {
+            if (this.elementEvents.filter((o:Obj) => { return (o.selector === selector && o.name === name && o.funcName === funcName) }).length === 0) {
                 this.elementEvents.push({ selector, name, funcName })
             }
             return '';
@@ -118,7 +119,7 @@ export default class Component extends EventTarget {
 
     public $off (type:string):void {
         if (Array.isArray(this.eventList[type])) {
-            this.eventList[type].forEach(e => {
+            this.eventList[type].forEach((e:EventListenerOrEventListenerObject|null) => {
                 this.removeEventListener(type,e)
             })
         }
