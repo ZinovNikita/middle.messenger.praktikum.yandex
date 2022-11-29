@@ -52,12 +52,12 @@ export default class Component<T extends ComponentOptionsType = {}> {
             const el = this.$find(`*[data-event${o.selector}="${o.selector}"]`);
             if (el !== null) {
                 el.removeAttribute(`data-event${o.selector}`);
-                this.eventBus.$off(`sub.${o.selector}.${o.name}`);
-                this.eventBus.$on(`sub.${o.selector}.${o.name}`,(event:Event) => {
+                this.eventBus.$off(`sub${this.$uid}.${o.selector}.${o.name}`);
+                this.eventBus.$on(`sub${this.$uid}.${o.selector}.${o.name}`,(event:Event) => {
                     if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event) }
                 })
                 el.addEventListener(o.name as string, (event:Event) => {
-                    this.$emit(`sub.${o.selector}.${o.name}`,event);
+                    this.$emit(`sub${this.$uid}.${o.selector}.${o.name}`,event);
                 });
             }
         })
