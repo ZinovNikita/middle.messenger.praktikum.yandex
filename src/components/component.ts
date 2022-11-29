@@ -86,7 +86,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
 
     public $title: string = '';
     public $compile (data:Obj) {
-        let event_id = 0;
+        let eventId = 0;
         this.$addHelper('if_eq', function (this:any, a:any, b:any, opts:any) {
             if (a === b) {
                 return opts.fn(this);
@@ -103,7 +103,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
             }
         });
         this.$addHelper('on', (name:string, funcName:string) => {
-            const eid:string = `${this.$uid}-${++event_id}`;
+            const eid:string = `${this.$uid}-${++eventId}`;
             this.elementEvents.push({ selector: eid, name, funcName })
             return new Handlebars.SafeString(`data-event${eid}="${eid}"`);
         });
