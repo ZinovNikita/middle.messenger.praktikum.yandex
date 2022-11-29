@@ -52,12 +52,12 @@ export default class Component<T extends ComponentOptionsType = {}> {
             const el = this.$find(`*[data-event${o.selector}="${o.selector}"]`);
             if (el !== null) {
                 el.removeAttribute(`data-event${o.selector}`);
-                this.eventBus.$off(`sub${this.$uid}.${o.selector}.${o.name}`);
-                this.eventBus.$on(`sub${this.$uid}.${o.selector}.${o.name}`,(event:Event) => {
+                this.eventBus.$off(`sub.${o.selector}.${o.name}`);
+                this.eventBus.$on(`sub.${o.selector}.${o.name}`,(event:Event) => {
                     if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event) }
                 })
                 el.addEventListener(o.name as string, (event:Event) => {
-                    this.$emit(`sub${this.$uid}.${o.selector}.${o.name}`,event);
+                    this.$emit(`sub.${o.selector}.${o.name}`,event);
                 });
             }
         })
@@ -86,6 +86,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
 
     public $title: string = '';
     public $compile (data:Obj) {
+        let event_id = 0;
         this.$addHelper('if_eq', function (this:any, a:any, b:any, opts:any) {
             if (a === b) {
                 return opts.fn(this);
@@ -102,7 +103,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
             }
         });
         this.$addHelper('on', (name:string, funcName:string) => {
-            const eid:string = `${Math.floor(new Date().getTime() * (Math.random() * 100)).toString(16)}`;
+            const eid:string = `${this.$uid}-${++event_id}`;
             this.elementEvents.push({ selector: eid, name, funcName })
             return new Handlebars.SafeString(`data-event${eid}="${eid}"`);
         });

@@ -8,7 +8,6 @@ export default class EventBus {
         if (!this.listeners[event]) {
             this.listeners[event] = [];
         }
-
         this.listeners[event].push(callback);
     }
 
@@ -17,6 +16,7 @@ export default class EventBus {
     }
 
     public $emit (event:string, ...args:any[]) {
+        console.log(event,this.listeners[event])
         if (!this.listeners[event]) return;
         this.listeners[event].forEach(listener => {
             listener(...args);
