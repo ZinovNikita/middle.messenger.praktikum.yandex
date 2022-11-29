@@ -2,7 +2,7 @@ import Component from '../components/component';
 import Modal from './modal';
 const chatTemplate:string = `
 <header class="chat-header">
-<a aria-label="Информация о собеседнике" id="profile-info" style="display:flex;" {{on 'click' 'openProfileInfo' '#profile-info'}}>
+<a aria-label="Информация о собеседнике" id="profile-info" style="display:flex;" {{on 'click' 'openProfileInfo'}}>
     <img alt="Аватар собеседника" class="chat-image" src="{{avatar}}"/>
     <b style="align-self: center;font-size:18px">{{first_name}} {{second_name}}</b>
 </a>
@@ -33,11 +33,11 @@ const chatTemplate:string = `
         <img alt="{{alt}}" src="{{url}}"/>
     {{/images}}
     </div>
-    <form id="message-form" class="inline" {{on 'submit' 'sendMessage' '#message-form'}}>
-        <textarea {{on 'input' 'onInput' '#message-form>textarea'}} name="message" placeholder="Сообщение">{{message}}</textarea>
+    <form id="message-form" class="inline" {{on 'submit' 'sendMessage'}}>
+        <textarea {{on 'input' 'onInput'}} name="message" placeholder="Сообщение">{{message}}</textarea>
         <label class="image-files">
             &equiv;
-            <input id="file-images" {{on 'change' 'addFile' '#file-images'}} name="images" type="file" multiple accept="image/*"/>
+            <input id="file-images" {{on 'change' 'addFile'}} name="images" type="file" multiple accept="image/*"/>
         </label>
         <input type="submit" disabled value="Отправить"/>
     </form>

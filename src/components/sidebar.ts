@@ -1,11 +1,11 @@
 import Component from './component';
 import Modal from '../components/modal';
 const sidebarTemplate:string = `
-<form id="search-form" class="search-box inline" {{on 'submit' 'onSearch' '#search-form'}} >
+<form id="search-form" class="search-box inline" {{on 'submit' 'onSearch'}} >
     <input id="{{uid}}-chat-search" type="text" name="chatSearch" class="search-input" placeholder="Поиск" value="{{chatSearch}}" style="width:68%"/>
-    <button type="button" id="profile-btn" class="profile"  {{on 'click' 'openProfile' '#profile-btn'}}>Профиль</button>
+    <button type="button" id="profile-btn" class="profile" {{on 'click' 'openProfile'}}>Профиль</button>
 </form>
-<ul class="chat-list" {{on 'click' 'chatSelect' '.chat-list'}}>
+<ul class="chat-list" {{on 'click' 'chatSelect'}}>
 {{#chats}}
 {{#if_filtred first_name second_name ../chatSearch}}
     {{#if active}}
