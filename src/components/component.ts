@@ -49,8 +49,9 @@ export default class Component<T extends ComponentOptionsType = {}> {
 
     private eventsBuild () {
         this.elementEvents.forEach((o:Obj) => {
-            const el = this.$find(o.selector as string);
+            const el = this.$find(`*[data-event${o.selector}="${o.selector}"]`);
             if (el !== null) {
+                el.removeAttribute(`data-event${o.selector}`);
                 this.eventBus.$off(`sub.${o.selector}.${o.name}`);
                 this.eventBus.$on(`sub.${o.selector}.${o.name}`,(event:Event) => {
                     if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event) }
@@ -100,11 +101,10 @@ export default class Component<T extends ComponentOptionsType = {}> {
                 return opts.inverse(this);
             }
         });
-        this.$addHelper('on', (name:string, funcName:string, selector:string) => {
-            if (this.elementEvents.filter((o:Obj) => { return (o.selector === selector && o.name === name && o.funcName === funcName) }).length === 0) {
-                this.elementEvents.push({ selector, name, funcName })
-            }
-            return '';
+        this.$addHelper('on', (name:string, funcName:string) => {
+            const eid:string = `${Math.floor(new Date().getTime() * (Math.random() * 100)).toString(16)}`;
+            this.elementEvents.push({ selector: eid, name, funcName })
+            return new Handlebars.SafeString(`data-event${eid}="${eid}"`);
         });
         return Handlebars.compile(this.template).call(this,data);
     }

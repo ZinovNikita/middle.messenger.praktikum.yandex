@@ -5,11 +5,7 @@ const modalTemplate:string = `
     <i id="{{uid}}-close" class="modal-close"
         {{on 'click' 'onClose' 'i.modal-close'}}>&times;</i>
 </header>
-<form id="{{uid}}-form" data-obj-type="modal-form"
-    {{on 'focusin' 'onFocus' 'form[data-obj-type="modal-form"]'}}
-    {{on 'focusout' 'onFocus' 'form[data-obj-type="modal-form"]'}}
-    {{on 'blur' 'onFocus' 'form[data-obj-type="modal-form"]'}}
-    {{on 'focus' 'onFocus' 'form[data-obj-type="modal-form"]'}}>
+<form id="{{uid}}-form" data-obj-type="modal-form" {{on 'focusin' 'onFocus'}} {{on 'focusout' 'onFocus'}} {{on 'blur' 'onFocus'}} {{on 'focus' 'onFocus'}}>
 {{#fields}}
     {{#if ../readonly}}
         {{#if_eq type 'avatar'}}
@@ -30,7 +26,7 @@ const modalTemplate:string = `
             <label>{{label}}</label>
             <label class="avatar-image">
                 <input data-obj-type="file-avatar" type="file" accept="image/*" name="{{name}}"
-                    {{on 'change' 'onSelectAvatar' 'input[data-obj-type="file-avatar"]'}}/>
+                    {{on 'change' 'onSelectAvatar'}}/>
                 <img data-obj-type="image" src="{{value}}"/>
             </label>
             <small class="error-msg"></small>
@@ -45,12 +41,12 @@ const modalTemplate:string = `
     {{/if}}
 {{/fields}}
 </form>
+{{#if_eq readonly false}}
 <footer class="modal-footer">
-    <button id="{{uid}}-cancel" class="btn-red" data-obj-type="cancel-btn"
-        {{on 'click' 'onCancel' 'button[data-obj-type="cancel-btn"]'}}>{{cancel_title}}</button>
-    <button id="{{uid}}-ok" data-obj-type="ok-btn"
-        {{on 'click' 'onOk' 'button[data-obj-type="ok-btn"]'}}>{{ok_title}}</button>
-</footer>`;
+    <button id="{{uid}}-cancel" class="btn-red" data-obj-type="cancel-btn" {{on 'click' 'onCancel'}}>{{cancel_title}}</button>
+    <button id="{{uid}}-ok" data-obj-type="ok-btn" {{on 'click' 'onOk'}}>{{ok_title}}</button>
+</footer>
+{{/if_eq}}`;
 export default class Modal extends Component {
     constructor (options:ComponentOptionsType) {
         if (!options.events) { options.events = {}; }
