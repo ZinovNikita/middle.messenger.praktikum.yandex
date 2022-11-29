@@ -16,7 +16,6 @@ export default class EventBus {
     }
 
     public $emit (event:string, ...args:any[]) {
-        console.log(event,this.listeners[event])
         if (!this.listeners[event]) return;
         this.listeners[event].forEach(listener => {
             listener(...args);
