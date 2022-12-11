@@ -1,4 +1,5 @@
 import Handlebars, { HelperDelegate } from 'handlebars';
+import Router from './router';
 import EventBus from './event_bus';
 export default class Component<T extends ComponentOptionsType = {}> {
     constructor (template:string, tagName:string = 'div', options:T) {
@@ -31,7 +32,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
         })
         Object.assign(this.attrs, options.attrs);
         Object.assign(this.props, options.props);
-        Object.assign(this.data, options.data);
+        Object.assign(this.data, options.data)
         Object.assign(this.events, options.events);
         Object.assign(this.methods, options.methods);
         this.props.id = this.uid;
@@ -63,6 +64,12 @@ export default class Component<T extends ComponentOptionsType = {}> {
         })
     }
 
+    // @ts-ignore - used after template compilation from element events
+    private routeTo (event:Event) {
+        event.preventDefault();
+        this.$router.$go((event.target as HTMLElement).getAttribute('href'))
+    }
+
     public $off (type:string):void {
         this.eventBus.$off(type);
     }
@@ -71,11 +78,13 @@ export default class Component<T extends ComponentOptionsType = {}> {
         this.eventBus.$emit(type,...args);
     }
 
+    public $title: string = '';
     public attrs: Obj = {};
     public props: Obj = {};
     public data: Obj = {};
     public events: ObjFunc = {};
     public methods: ObjFunc = {};
+    public $router: RouterType = Router.Init();
     public get $el ():Element {
         return this.element;
     }
@@ -84,7 +93,6 @@ export default class Component<T extends ComponentOptionsType = {}> {
         return this.uid;
     }
 
-    public $title: string = '';
     public $compile (data:Obj) {
         let eventId = 0;
         this.$addHelper('if_eq', function (this:any, a:any, b:any, opts:any) {
@@ -107,6 +115,11 @@ export default class Component<T extends ComponentOptionsType = {}> {
             this.elementEvents.push({ selector: eid, name, funcName })
             return new Handlebars.SafeString(`data-event${eid}="${eid}"`);
         });
+        this.$addHelper('route', (pathname:string) => {
+            const eid:string = `${this.$uid}-${++eventId}`;
+            this.elementEvents.push({ selector: eid, name: 'click', funcName: 'routeTo' })
+            return new Handlebars.SafeString(`data-event${eid}="${eid}" href="${pathname}"`);
+        });
         return Handlebars.compile(this.template).call(this,data);
     }
 
@@ -125,5 +138,10 @@ export default class Component<T extends ComponentOptionsType = {}> {
     public $attach (el: Element) {
         el.appendChild(this.element);
         this.$emit('attach');
+    }
+
+    public $hide () {
+        this.element.parentElement?.removeChild(this.element);
+        this.$emit('hide');
     }
 }

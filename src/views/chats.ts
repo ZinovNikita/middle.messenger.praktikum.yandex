@@ -19,7 +19,7 @@ const chats:Obj[] = [{
     avatar: 'https://thispersondoesnotexist.com/image?q=2222222222222222222',
     last_message: 'Привет! Я не приехал!'
 }];
-export default class Chats extends Component {
+export default <ViewConstructor> class Chats extends Component {
     constructor () {
         super(chatsTemplate,'main',{
             props: { className: 'container' }

@@ -2,16 +2,15 @@ import Component from './component';
 const modalTemplate:string = `
 <header class="modal-title">
     <h3>{{title}}</h3>
-    <i id="{{uid}}-close" class="modal-close"
-        {{on 'click' 'onClose' 'i.modal-close'}}>&times;</i>
+    <i class="modal-close" {{on 'click' 'onClose'}}>&times;</i>
 </header>
-<form id="{{uid}}-form" data-obj-type="modal-form" {{on 'focusin' 'onFocus'}} {{on 'focusout' 'onFocus'}} {{on 'blur' 'onFocus'}} {{on 'focus' 'onFocus'}}>
+<form id="{{uid}}-form" {{on 'focusin' 'onFocus'}} {{on 'focusout' 'onFocus'}} {{on 'blur' 'onFocus'}} {{on 'focus' 'onFocus'}}>
 {{#fields}}
     {{#if ../readonly}}
         {{#if_eq type 'avatar'}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label class="avatar-image">
-                <img data-obj-type="image" src="{{value}}"/>
+                <img src="{{value}}"/>
             </label>
         </fieldset>
         {{else}}
@@ -25,16 +24,16 @@ const modalTemplate:string = `
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
             <label class="avatar-image">
-                <input data-obj-type="file-avatar" type="file" accept="image/*" name="{{name}}"
+                <input type="file" accept="image/*" name="{{name}}"
                     {{on 'change' 'onSelectAvatar'}}/>
-                <img data-obj-type="image" src="{{value}}"/>
+                <img src="{{value}}"/>
             </label>
             <small class="error-msg"></small>
         </fieldset>
         {{else}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
-            <input data-obj-type="field" type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"/>
+            <input type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"/>
             <small class="error-msg"></small>
         </fieldset>
         {{/if_eq}}
@@ -43,26 +42,32 @@ const modalTemplate:string = `
 </form>
 {{#if_eq readonly false}}
 <footer class="modal-footer">
-    <button id="{{uid}}-cancel" class="btn-red" data-obj-type="cancel-btn" {{on 'click' 'onCancel'}}>{{cancel_title}}</button>
-    <button id="{{uid}}-ok" data-obj-type="ok-btn" {{on 'click' 'onOk'}}>{{ok_title}}</button>
+    <button class="btn-red" {{on 'click' 'onCancel'}}>{{cancel_title}}</button>
+    <button {{on 'click' 'onOk'}}>{{ok_title}}</button>
 </footer>
 {{/if_eq}}`;
 export default class Modal extends Component {
     constructor (options:ComponentOptionsType) {
-        if (!options.events) { options.events = {}; }
-        options.events['html-update'] = () => {
-            (<Obj[]> this.data.fields).forEach((f:Obj) => {
-                this.fvalues[f.name as keyof Obj] = f.value;
-            })
-            this.$emit('mounted');
-        }
+        options.events = Object.assign({},options.events)
+        options.events = Object.assign(options.events,{
+            'html-update': () => {
+                (<Obj[]> this.data.fields).forEach((f:Obj) => {
+                    this.fvalues[f.name as keyof Obj] = f.value;
+                })
+                this.$emit('mounted');
+            },
+            attach: () => {
+                (<HTMLDialogElement> this.$el).showModal();
+                this.$emit('open');
+            }
+        });
         super(modalTemplate,'dialog', options);
         (<HTMLDialogElement> this.$el).close();
         this.props.className = 'modal';
         this.$emit('html-update');
     }
 
-    private fvalues: Obj = {};
+    public fvalues: Obj = {};
 
     // @ts-ignore - used after template compilation from element events
     private onFocus (event:any) {
@@ -110,12 +115,6 @@ export default class Modal extends Component {
                 resolve({ success: true });
             })
         }
-    }
-
-    public $open () {
-        this.$attach(document.body);
-        (<HTMLDialogElement> this.$el).showModal();
-        this.$emit('open');
     }
 
     public $close (result:boolean = false) {

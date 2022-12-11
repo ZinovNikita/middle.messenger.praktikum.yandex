@@ -11,9 +11,8 @@
 Настроена проверка стиля кода eslint и stylelint
 
 ## Страницы проекта на Netlify
-- [Главная страница](https://elaborate-paprenjak-e0ca12.netlify.app/index.html) — отображаются ссылки на все страницы
-- [Список чатов](https://elaborate-paprenjak-e0ca12.netlify.app/chats.html) — отображается список чатов и в каждом из них список сообщений
-- [Авторизация](https://elaborate-paprenjak-e0ca12.netlify.app/signin.html) — Вход для существующих пользователей
-- [Регистрация](https://elaborate-paprenjak-e0ca12.netlify.app/signup.html) — Регистрация новых пользователей
-- [404 Ошибка](https://elaborate-paprenjak-e0ca12.netlify.app/404.html) — Ошибка 404
-- [5** Ошибка](https://elaborate-paprenjak-e0ca12.netlify.app/500.html) — Ошибка 5**
+- [Авторизация](https://elaborate-paprenjak-e0ca12.netlify.app/) — Вход для существующих пользователей
+- [Регистрация](https://elaborate-paprenjak-e0ca12.netlify.app/sign-up) — Регистрация новых пользователей
+- [Список чатов](https://elaborate-paprenjak-e0ca12.netlify.app/messenger) — отображается список чатов и в каждом из них список сообщений
+- [404 Ошибка](https://elaborate-paprenjak-e0ca12.netlify.app/404) — Ошибка 404
+- [5** Ошибка](https://elaborate-paprenjak-e0ca12.netlify.app/500) — Ошибка 5**

@@ -20,8 +20,11 @@ declare type ComponentType = {
     $findAll: Function,
     $title: string,
     $attach: Function,
+    $hide: Function,
     $el:Element,
     $uid:string,
+    $emit: Function,
+    $off: Function
 }
 declare type ObjComponentType = {[id:string]:ComponentType}
 declare type Fetch2OptionsType = {
@@ -37,10 +40,25 @@ declare type Fetch2Type = {
     $post: Fetch2MethodType,
     $put: Fetch2MethodType,
     $delete: Fetch2MethodType,
-    $request: Fetch2MethodType
+    $request: Fetch2MethodType,
 }
 declare type EventBus = {
     $on: Function,
     $off: Function,
     $emit: Function,
+}
+declare type RouterType = {
+    $use: Function,
+    $start: Function,
+    $go: Function,
+    $getRoute: Function,
+}
+declare type RouteType = {
+    $navigate: Function,
+    $leave: Function,
+    $match: Function,
+    $render: Function,
+}
+declare interface ViewConstructor {
+    new (...props:unknown): ComponentType;
 }
