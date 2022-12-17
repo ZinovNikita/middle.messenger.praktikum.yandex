@@ -1,4 +1,5 @@
 import Component from './component';
+import api from '../api';
 const modalTemplate:string = `
 <header class="modal-title">
     <h3>{{title}}</h3>
@@ -24,8 +25,7 @@ const modalTemplate:string = `
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
             <label class="avatar-image">
-                <input type="file" accept="image/*" name="{{name}}"
-                    {{on 'change' 'onSelectAvatar'}}/>
+                <input type="file" accept="image/*" name="{{name}}" {{on 'change' 'onSelectAvatar'}}/>
                 <img src="{{value}}"/>
             </label>
             <small class="error-msg"></small>
@@ -100,7 +100,12 @@ export default class Modal extends Component {
 
     // @ts-ignore - used after template compilation from element events
     private onSelectAvatar (event:any) {
-        this.$emit('select-avatar',event.target.files)
+        api.users.$avatar(event.target.files[0]).then((url:string)=>{
+            this.$find(`#${this.$uid}-fieldset-avatar img`)?.setAttribute('src',url);
+            this.fvalues.avatar = url;
+            this.$emit('input','avatar',url);
+            this.$emit('select-avatar')
+        });
     }
 
     public $field_error (key:string,msg:string = '') {
@@ -109,12 +114,29 @@ export default class Modal extends Component {
     }
 
     public $is_valid (key:string|undefined = undefined):Promise<boolean> {
-        if (typeof this.methods.validator === 'function') { return this.methods.validator.call(this,key); } else {
+        if(key===undefined){
+            for (const k in this.fvalues) {
+                let tmp:any = this.$find(`*[name="${k}"]`);
+                if(tmp!==null){
+                    this.fvalues[tmp.name] = tmp.value;
+                    this.$emit('input',tmp.name,tmp.value);
+                }
+            }
+        }
+        if (typeof this.methods.validator === 'function')
+            return this.methods.validator.call(this,key);
+        else {
             return new Promise((resolve:Function) => {
-                for (const k in this.fvalues) { this.$field_error(k) }
+                for (const k in this.fvalues)
+                    this.$field_error(k);
                 resolve({ success: true });
             })
         }
+    }
+
+    public $attach () {
+        document.body.appendChild(this.$el);
+        this.$emit('attach');
     }
 
     public $close (result:boolean = false) {

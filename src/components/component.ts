@@ -1,6 +1,6 @@
 import Handlebars, { HelperDelegate } from 'handlebars';
-import Router from './router';
 import EventBus from './event_bus';
+import api from '../api';
 export default class Component<T extends ComponentOptionsType = {}> {
     constructor (template:string, tagName:string = 'div', options:T) {
         this.element = document.createElement(tagName);
@@ -21,15 +21,21 @@ export default class Component<T extends ComponentOptionsType = {}> {
                 return true;
             }
         })
-        this.eventBus.$on('html-update', () => this.eventsBuild())
-        this.data = new Proxy({},{
+        const proxyProps:ProxyHandler<any> = {
             set: (target:any, prop:string, val: any) => {
                 target[prop] = val;
-                this.element.innerHTML = this.$compile(target);
-                this.$emit('html-update')
+                this.$compile();
                 return true;
-            }
-        })
+            },
+            get: (target:any, prop:string) => {
+                if (typeof target[prop] === 'object' && target[prop] !== null) {
+                    return new Proxy(target[prop], proxyProps)
+                } else {
+                    return target[prop];
+                }
+            },
+        }
+        this.data = new Proxy({},proxyProps)
         Object.assign(this.attrs, options.attrs);
         Object.assign(this.props, options.props);
         Object.assign(this.data, options.data)
@@ -53,12 +59,12 @@ export default class Component<T extends ComponentOptionsType = {}> {
             const el = this.$find(`*[data-event${o.selector}="${o.selector}"]`);
             if (el !== null) {
                 el.removeAttribute(`data-event${o.selector}`);
-                this.eventBus.$off(`sub.${o.selector}.${o.name}`);
-                this.eventBus.$on(`sub.${o.selector}.${o.name}`,(event:Event) => {
+                this.eventBus.$off(`sub.${o.selector}`);
+                this.eventBus.$on(`sub.${o.selector}`,(event:Event) => {
                     if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event) }
                 })
                 el.addEventListener(o.name as string, (event:Event) => {
-                    this.$emit(`sub.${o.selector}.${o.name}`,event);
+                    this.$emit(`sub.${o.selector}`,event);
                 });
             }
         })
@@ -84,17 +90,25 @@ export default class Component<T extends ComponentOptionsType = {}> {
     public data: Obj = {};
     public events: ObjFunc = {};
     public methods: ObjFunc = {};
-    public $router: RouterType = Router.Init();
+    public static $router: RouterType;
+    public static $store: StoreType;
     public get $el ():Element {
         return this.element;
+    }
+    public get $router ():RouterType {
+        return Component.$router;
+    }
+    public get $store ():StoreType {
+        return Component.$store;
     }
 
     public get $uid ():string {
         return this.uid;
     }
 
-    public $compile (data:Obj) {
+    public $compile () {
         let eventId = 0;
+        this.elementEvents = [];
         this.$addHelper('if_eq', function (this:any, a:any, b:any, opts:any) {
             if (a === b) {
                 return opts.fn(this);
@@ -110,6 +124,9 @@ export default class Component<T extends ComponentOptionsType = {}> {
                 return opts.inverse(this);
             }
         });
+        this.$addHelper('resourceUrl', (path:string) => {
+            return new Handlebars.SafeString(api.resourceUrl(path));
+        });
         this.$addHelper('on', (name:string, funcName:string) => {
             const eid:string = `${this.$uid}-${++eventId}`;
             this.elementEvents.push({ selector: eid, name, funcName })
@@ -120,7 +137,9 @@ export default class Component<T extends ComponentOptionsType = {}> {
             this.elementEvents.push({ selector: eid, name: 'click', funcName: 'routeTo' })
             return new Handlebars.SafeString(`data-event${eid}="${eid}" href="${pathname}"`);
         });
-        return Handlebars.compile(this.template).call(this,data);
+        this.element.innerHTML = Handlebars.compile(this.template).call(this,this.data);
+        this.eventsBuild()
+        this.$emit('html-update');
     }
 
     public $addHelper (name:string,cb:HelperDelegate) {

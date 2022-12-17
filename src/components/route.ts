@@ -28,7 +28,7 @@ export default class Route {
         }
     }
 
-    $match (pathname:string) {
+    $match (pathname:string):boolean {
         return isEqual(pathname, this.pathname);
     }
 

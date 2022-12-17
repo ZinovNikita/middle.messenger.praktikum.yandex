@@ -1,30 +1,39 @@
 import Component from './component';
 import Modal from '../components/modal';
+import api from '../api';
 const sidebarTemplate:string = `
 <form id="search-form" class="search-box inline" {{on 'submit' 'onSearch'}} >
-    <input id="{{uid}}-chat-search" type="text" name="chatSearch" class="search-input" placeholder="Поиск" value="{{chatSearch}}" style="width:68%"/>
-    <button type="button" id="profile-btn" class="profile" {{on 'click' 'openProfile'}}>Профиль</button>
+    <input id="{{uid}}-chat-search" type="text" name="chatSearch" class="search-input" placeholder="Поиск" value="{{chatSearch}}"/>
+    <img alt="Профиль" title="Профиль" class="profile-image" src="{{resourceUrl avatar}}" {{on 'click' 'openProfile'}}/>
+    <sup class="logout" {{on 'click' 'logoutProfile'}} title="Выйти из приложения">&#8855;</sup>
 </form>
 <ul class="chat-list" {{on 'click' 'chatSelect'}}>
 {{#chats}}
-{{#if_filtred first_name second_name ../chatSearch}}
+{{#if_filtred title ../chatSearch}}
     {{#if active}}
     <li chat-id="{{id}}" class="chat-item active">
     {{else}}
     <li chat-id="{{id}}" class="chat-item">
     {{/if}}
-        <img alt="Аватар {{first_name}} {{second_name}}" class="chat-image" src="{{avatar}}"/>
+        <img alt="Аватар {{title}}" class="chat-image" src="{{resourceUrl avatar}}"/>
         <div class="chat-text">
-            <b class="chat-title">{{first_name}} {{second_name}}</b>
-            <span class="mutted">{{last_message}}</span>
+            <b class="chat-title">
+                {{title}}
+            {{#if unread_count}}
+                ({{unread_count}})
+            {{/if}}
+            </b>
+        {{#if last_message}}
+            <span class="mutted">{{last_message.content}}</span>
+        {{/if}}
         </div>
     </li>
 {{/if_filtred}}
 {{/chats}}
 </ul>`;
 export default class Sidebar extends Component {
-    constructor (chats:Obj[], events:ObjFunc = {}) {
-        super(sidebarTemplate,'nav',{ props: { className: 'sidebar' },data: { chats }, events });
+    constructor (events:ObjFunc = {}) {
+        super(sidebarTemplate,'nav',{ props: { className: 'sidebar' }, events });
         this.profileEditModal = new Modal({
             data: {
                 title: 'Профиль',
@@ -40,22 +49,20 @@ export default class Sidebar extends Component {
                 },
                 open: () => {
                     this.profileEditModal.data.fields = [];
-                    setTimeout(() => {
+                    api.auth.$user().then((res:any)=>{
                         this.profileEditModal.data.fields = [
-                            { label: 'Аватар', type: 'avatar', name: 'avatar', value: 'https://thispersondoesnotexist.com/image?q=0' },
-                            { label: 'Имя', type: 'text', name: 'first_name', value: 'Никита' },
-                            { label: 'Фамилия', type: 'text', name: 'second_name', value: 'Зинов' },
-                            { label: 'Логин', type: 'text', name: 'login', value: 'ZinovNA' },
-                            { label: 'Email', type: 'email', name: 'email', value: 'email@email.ru' },
-                            { label: 'Телефон', type: 'tel', name: 'phone', value: '+79876543210' },
-                            { label: 'Старый пароль', type: 'password', name: 'oldPassword' },
-                            { label: 'Новый пароль', type: 'password', name: 'newPassword' },
-                            { label: 'Подтвердите пароль', type: 'password', name: 'newPassword2' }
+                            { label: 'Аватар', type: 'avatar', name: 'avatar', value: api.resourceUrl(res.avatar) },
+                            { label: 'Имя', type: 'text', name: 'first_name', value: res.first_name },
+                            { label: 'Фамилия', type: 'text', name: 'second_name', value: res.second_name },
+                            { label: 'Псевдоним', type: 'text', name: 'display_name', value: res.display_name },
+                            { label: 'Логин', type: 'text', name: 'login', value: res.login },
+                            { label: 'Email', type: 'email', name: 'email', value: res.email },
+                            { label: 'Телефон', type: 'tel', name: 'phone', value: res.phone }
                         ]
-                    },500)
+                    })
                 },
-                'select-avatar': (files:FileList) => {
-                    this.profileEditModal.$find(`#${this.profileEditModal.$uid}-fieldset-avatar img`)?.setAttribute('src',URL.createObjectURL(files[0]));
+                'select-avatar': () => {
+                    this.data.avatar = this.avatar
                 }
             },
             methods: {
@@ -81,14 +88,6 @@ export default class Sidebar extends Component {
                             if (!value || !value.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
                                 return 'укажите корректный Email';
                             }
-                        } else if (name === 'oldPassword') {
-                            if (!value ||
-                            value.length < 8 ||
-                            value.length > 40 ||
-                            !value.match(/[A-ZА-ЯЁ]/) ||
-                            !value.match(/[^0-9]/)) {
-                                return 'от 8 до 40 символов, обязательно хотя бы одна заглавная буква и цифра';
-                            }
                         }
                         return '';
                     }
@@ -105,43 +104,58 @@ export default class Sidebar extends Component {
                                 this.$field_error(k,msg)
                             }
                             if (success) {
-                                setTimeout(() => {
-                                // checkPassword on Server
-                                    resolve(true);
-                                },1000)
+                                api.users.$profile(this.fvalues).then(()=>{resolve(true)}).catch(()=>{resolve(false)})
                             } else { resolve(success); }
                         }
                     })
                 }
             }
         });
-        this.$addHelper('if_filtred', function (this:any, fn:string, sn:string, srch:string, opts:any) {
+        this.data.avatar = this.avatar
+        api.chats.$chat_list().then(()=>{
+            this.data.chats = this.$store.$get('chat_list')
+        })
+        this.$addHelper('if_filtred', function (this:any, title:string, srch:string, opts:any) {
             if (!srch || srch.length === 0) {
                 return opts.fn(this);
-            } else if (`${fn} ${sn}`.indexOf(srch) >= 0) {
+            } else if (`${title}`.indexOf(srch) >= 0) {
                 return opts.fn(this);
             } else {
                 return opts.inverse(this);
             }
         });
     }
-
+    private get avatar(){
+        if(this.$store.$has('user'))
+            return this.$store.$get('user').avatar
+        return ''
+    }
     private profileEditModal:Modal;
     private activate (id:number) {
         this.data.chats = (<Obj[]> this.data.chats).map((ch:Obj) => {
-            return { ...ch,active: (ch.id === id) }
+            ch.active = (ch.id === id)
+            return ch
         })
     }
 
     // @ts-ignore - used after template compilation from element events
     private onSearch (event:Event) {
         event.preventDefault();
-        this.data.chatSearch = (<HTMLFormElement>event.target).chatSearch.value;
+        api.chats.$chat_list(0,(<HTMLFormElement>event.target).chatSearch.value).then(()=>{
+            this.data.chats = this.$store.$get('chat_list')
+        })
     }
 
     // @ts-ignore - used after template compilation from element events
     private openProfile () {
-        this.profileEditModal.$open()
+        this.profileEditModal.$attach()
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private logoutProfile () {
+        api.auth.$logOut().then(()=>{
+            this.$router.$go('/')
+        });
     }
 
     // @ts-ignore - used after template compilation from element events

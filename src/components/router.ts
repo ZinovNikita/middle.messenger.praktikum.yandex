@@ -51,6 +51,10 @@ class Router implements RouterType {
     public $getRoute (pathname:string) {
         return this.routes.find(route => route.$match(pathname));
     }
+
+    public $match (pathname:string):boolean {
+        return this.currentRoute?.$match(pathname);
+    }
 }
 
 export default Router;

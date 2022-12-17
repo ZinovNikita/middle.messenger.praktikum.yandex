@@ -23,6 +23,22 @@ function isEqual (lhs: any, rhs: any):boolean {
     }
     return true;
 }
+function freeze (obj: any):any {
+    if (isObject(obj)) {
+        Object.freeze(obj);
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key))
+                freeze(obj[key]);
+        }
+    }
+    if (isArray(obj)) {
+        Object.freeze(obj);
+        for (let key of obj) {
+            freeze(key);
+        }
+    }
+    return obj;
+}
 function merge (lhs: Obj, rhs: Obj): Obj {
     if (isObject(lhs) && isObject(rhs)) {
         for (const key in rhs) {
@@ -42,5 +58,6 @@ export {
     isArrayOrObject,
     isEqual,
     fetch2,
-    merge
+    merge,
+    freeze
 }
