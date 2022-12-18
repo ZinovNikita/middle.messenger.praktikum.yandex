@@ -42,6 +42,9 @@ const modalTemplate:string = `
 </form>
 {{#if_eq readonly false}}
 <footer class="modal-footer">
+{{#buttons}}
+    <button class="{{class}}" {{on 'click' 'onButton'}} event="{{event}}">{{title}}</button>
+{{/buttons}}
     <button class="btn-red" {{on 'click' 'onCancel'}}>{{cancel_title}}</button>
     <button {{on 'click' 'onOk'}}>{{ok_title}}</button>
 </footer>
@@ -57,7 +60,7 @@ export default class Modal extends Component {
                 this.$emit('mounted');
             },
             attach: () => {
-                (<HTMLDialogElement> this.$el).showModal();
+                if (!(<HTMLDialogElement> this.$el).open) { (<HTMLDialogElement> this.$el).showModal(); }
                 this.$emit('open');
             }
         });
@@ -83,6 +86,11 @@ export default class Modal extends Component {
     }
 
     // @ts-ignore - used after template compilation from element events
+    private onButton (event:any) {
+        this.$emit(event.target.getAttribute('event'));
+    }
+
+    // @ts-ignore - used after template compilation from element events
     private onOk () {
         this.$is_valid().then((success:boolean) => {
             if (success === true) {
@@ -100,7 +108,7 @@ export default class Modal extends Component {
 
     // @ts-ignore - used after template compilation from element events
     private onSelectAvatar (event:any) {
-        api.users.$avatar(event.target.files[0]).then((url:string)=>{
+        api.users.$avatar(event.target.files[0]).then((url:string) => {
             this.$find(`#${this.$uid}-fieldset-avatar img`)?.setAttribute('src',url);
             this.fvalues.avatar = url;
             this.$emit('input','avatar',url);
@@ -114,21 +122,18 @@ export default class Modal extends Component {
     }
 
     public $is_valid (key:string|undefined = undefined):Promise<boolean> {
-        if(key===undefined){
+        if (key === undefined) {
             for (const k in this.fvalues) {
-                let tmp:any = this.$find(`*[name="${k}"]`);
-                if(tmp!==null){
+                const tmp:any = this.$find(`*[name="${k}"]`);
+                if (tmp !== null) {
                     this.fvalues[tmp.name] = tmp.value;
                     this.$emit('input',tmp.name,tmp.value);
                 }
             }
         }
-        if (typeof this.methods.validator === 'function')
-            return this.methods.validator.call(this,key);
-        else {
+        if (typeof this.methods.validator === 'function') { return this.methods.validator.call(this,key); } else {
             return new Promise((resolve:Function) => {
-                for (const k in this.fvalues)
-                    this.$field_error(k);
+                for (const k in this.fvalues) { this.$field_error(k); }
                 resolve({ success: true });
             })
         }

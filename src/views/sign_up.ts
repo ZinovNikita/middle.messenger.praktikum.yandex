@@ -19,20 +19,14 @@ export default <ViewConstructor> class SignUp extends Modal {
                 cancel_title: 'Войти'
             },
             events: {
-                open:()=>{
-                    if(api.auth.$authorized){
-                        (<HTMLDialogElement> this.$el).close();
-                        this.$el.remove();
-                        this.$router.$go('/messenger');
-                    }
-                    else
-                        this.$title = 'Вход';
+                open: () => {
+                    this.$title = 'Регистрация';
                 },
-                cancel:()=>{
+                cancel: () => {
                     this.$router.$go('/')
                 },
-                done:(result:boolean, fvalues?:SignUpParams)=>{
-                    if (result===true) {
+                done: (result:boolean, fvalues?:SignUpParams) => {
+                    if (result === true) {
                         console.log('Регистрация', fvalues);
                         this.$router.$go('/messenger')
                     }
@@ -72,6 +66,13 @@ export default <ViewConstructor> class SignUp extends Modal {
                             if (name === 'password2' && value !== (<any> this.fvalues).password) {
                                 return 'Пароли не совпадают';
                             }
+                        } else if (name === 'phone') {
+                            if (!value ||
+                            value.length < 10 ||
+                            value.length > 15 ||
+                            !value.match(/^(\+|\d)([\d].?)\d/g)) {
+                                return 'от 10 до 15 символов, состоит из цифр, может начинается с плюса.'
+                            }
                         }
                         return '';
                     };
@@ -87,11 +88,11 @@ export default <ViewConstructor> class SignUp extends Modal {
                                 success &&= msg.length === 0;
                                 this.$field_error(k, msg);
                             }
-                            if(success===true){
-                                api.auth.$signUp(this.fvalues as SignUpParams).then(res=>{
+                            if (success === true) {
+                                api.auth.$signUp(this.fvalues as SignUpParams).then(res => {
                                     console.log(res);
                                     resolve(success);
-                                }).catch((...p)=>{
+                                }).catch((...p) => {
                                     console.error(p);
                                     resolve(false)
                                 })

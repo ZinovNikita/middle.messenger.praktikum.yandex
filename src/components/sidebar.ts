@@ -40,7 +40,12 @@ export default class Sidebar extends Component {
                 readonly: false,
                 fields: [],
                 ok_title: 'Сохранить',
-                cancel_title: 'Отмена'
+                cancel_title: 'Отмена',
+                buttons: [{
+                    class: '',
+                    event: 'change-password',
+                    title: 'Сменить пароль'
+                }]
             },
             events: {
                 done: (result:boolean,fvalues?:Obj|undefined) => {
@@ -49,7 +54,7 @@ export default class Sidebar extends Component {
                 },
                 open: () => {
                     this.profileEditModal.data.fields = [];
-                    api.auth.$user().then((res:any)=>{
+                    api.auth.$user().then((res:any) => {
                         this.profileEditModal.data.fields = [
                             { label: 'Аватар', type: 'avatar', name: 'avatar', value: api.resourceUrl(res.avatar) },
                             { label: 'Имя', type: 'text', name: 'first_name', value: res.first_name },
@@ -63,6 +68,10 @@ export default class Sidebar extends Component {
                 },
                 'select-avatar': () => {
                     this.data.avatar = this.avatar
+                },
+                'change-password': () => {
+                    this.profileEditModal.$close()
+                    this.passwordModal.$attach()
                 }
             },
             methods: {
@@ -88,6 +97,13 @@ export default class Sidebar extends Component {
                             if (!value || !value.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
                                 return 'укажите корректный Email';
                             }
+                        } else if (name === 'phone') {
+                            if (!value ||
+                            value.length < 10 ||
+                            value.length > 15 ||
+                            !value.match(/^(\+|\d)([\d].?)\d/g)) {
+                                return 'от 10 до 15 символов, состоит из цифр, может начинается с плюса.'
+                            }
                         }
                         return '';
                     }
@@ -104,7 +120,59 @@ export default class Sidebar extends Component {
                                 this.$field_error(k,msg)
                             }
                             if (success) {
-                                api.users.$profile(this.fvalues).then(()=>{resolve(true)}).catch(()=>{resolve(false)})
+                                api.users.$profile(this.fvalues).then(() => { resolve(true) }).catch(() => { resolve(false) })
+                            } else { resolve(success); }
+                        }
+                    })
+                }
+            }
+        });
+        this.passwordModal = new Modal({
+            data: {
+                title: 'Сменить пароль',
+                readonly: false,
+                fields: [
+                    { label: 'Старый пароль', type: 'password', name: 'oldPassword' },
+                    { label: 'Новый пароль', type: 'password', name: 'newPassword' }
+                ],
+                ok_title: 'Сохранить',
+                cancel_title: 'Отмена'
+            },
+            events: {
+                done: (result:boolean,fvalues?:Obj|undefined) => {
+                    // update profile on server
+                    console.log('Профиль',result,fvalues);
+                }
+            },
+            methods: {
+                validator (this:Modal,key:string|undefined) {
+                    const checkFields = (name:string,value:string):string => {
+                        if (name === 'oldPassword' || name === 'newPassword') {
+                            if (!value ||
+                        value.length < 8 ||
+                        value.length > 40 ||
+                        !value.match(/[A-Z]/) ||
+                        !value.match(/[^0-9]/)) {
+                                return 'от 8 до 40 символов, обязательно хотя бы одна заглавная буква и цифра';
+                            }
+                            if (this.fvalues.oldPassword === this.fvalues.newPassword) { return 'Пароли совпадают'; }
+                        }
+                        return '';
+                    }
+                    return new Promise((resolve:Function) => {
+                        if (typeof key !== 'undefined' && key.length > 0) {
+                            const msg:string = checkFields(key,<string>(<any> this.fvalues)[key]);
+                            this.$field_error(key,msg);
+                            resolve(msg.length === 0);
+                        } else {
+                            let success:boolean = true;
+                            for (const k in this.fvalues) {
+                                const msg:string = checkFields(k,<string>(<any> this.fvalues)[k]);
+                                success &&= msg.length === 0;
+                                this.$field_error(k,msg)
+                            }
+                            if (success) {
+                                api.users.$password(this.fvalues).then(() => { resolve(true) }).catch(() => { resolve(false) })
                             } else { resolve(success); }
                         }
                     })
@@ -112,7 +180,7 @@ export default class Sidebar extends Component {
             }
         });
         this.data.avatar = this.avatar
-        api.chats.$chat_list().then(()=>{
+        api.chats.$chat_list().then(() => {
             this.data.chats = this.$store.$get('chat_list')
         })
         this.$addHelper('if_filtred', function (this:any, title:string, srch:string, opts:any) {
@@ -125,12 +193,14 @@ export default class Sidebar extends Component {
             }
         });
     }
-    private get avatar(){
-        if(this.$store.$has('user'))
-            return this.$store.$get('user').avatar
+
+    private get avatar () {
+        if (this.$store.$has('user')) { return this.$store.$get('user').avatar }
         return ''
     }
+
     private profileEditModal:Modal;
+    private passwordModal:Modal;
     private activate (id:number) {
         this.data.chats = (<Obj[]> this.data.chats).map((ch:Obj) => {
             ch.active = (ch.id === id)
@@ -141,7 +211,7 @@ export default class Sidebar extends Component {
     // @ts-ignore - used after template compilation from element events
     private onSearch (event:Event) {
         event.preventDefault();
-        api.chats.$chat_list(0,(<HTMLFormElement>event.target).chatSearch.value).then(()=>{
+        api.chats.$chat_list(0,(<HTMLFormElement>event.target).chatSearch.value).then(() => {
             this.data.chats = this.$store.$get('chat_list')
         })
     }
@@ -153,7 +223,7 @@ export default class Sidebar extends Component {
 
     // @ts-ignore - used after template compilation from element events
     private logoutProfile () {
-        api.auth.$logOut().then(()=>{
+        api.auth.$logOut().then(() => {
             this.$router.$go('/')
         });
     }

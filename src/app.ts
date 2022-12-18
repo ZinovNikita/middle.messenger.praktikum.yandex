@@ -22,14 +22,12 @@ class Application {
             .$use('/messenger',ChatsPage)
             .$use('/404',ErrorPage, { status: 404, title: 'Страница не найдена', message: 'Страница не найдена' })
             .$use('/500',ErrorPage, { status: 500, title: 'Возникла ошибка на сервере', message: 'Возникла ошибка на сервере' })
-        api.auth.$user().then(()=>{
+        api.auth.$user().then(() => {
             Component.$router.$start();
-            if(Component.$router.$match('/') || Component.$router.$match('/sign-up'))
-                Component.$router.$go('/messenger');
-        }).catch(()=>{
+            if (Component.$router.$match('/') || Component.$router.$match('/sign-up')) { Component.$router.$go('/messenger'); }
+        }).catch(() => {
             Component.$router.$start();
-            if(!Component.$router.$match('/'))
-                Component.$router.$go('/');
+            if (!Component.$router.$match('/')) { Component.$router.$go('/'); }
         })
     }
 }

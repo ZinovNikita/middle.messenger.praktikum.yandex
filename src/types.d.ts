@@ -9,6 +9,19 @@ declare type ComponentOptionsType = {
     events?: ObjFunc,
     methods?: ObjFunc,
 }
+declare type RouterType = {
+    $use: Function,
+    $start: Function,
+    $go: Function,
+    $getRoute: Function,
+    $match: Function,
+}
+declare type StoreType = {
+    $set: Function,
+    $has: Function,
+    $remove: Function,
+    $get: Function,
+}
 declare type ComponentType = {
     attrs: Obj,
     props: Obj,
@@ -49,13 +62,6 @@ declare type EventBus = {
     $off: Function,
     $emit: Function,
 }
-declare type RouterType = {
-    $use: Function,
-    $start: Function,
-    $go: Function,
-    $getRoute: Function,
-    $match: Function,
-}
 declare type RouteType = {
     $navigate: Function,
     $leave: Function,
@@ -77,12 +83,6 @@ declare type SignInParams = {
     login: string,
     password: string,
 }
-declare type StoreType = {
-    $set: Function,
-    $has: Function,
-    $remove: Function,
-    $get: Function,
-}
 declare type UserType = {
     first_name:string|null,
     second_name:string|null,
@@ -92,7 +92,7 @@ declare type UserType = {
     phone:string|null,
     avatar?:string|null,
 }
-declare type ChatType =   {
+declare type ChatType = {
     id: number,
     title: string,
     avatar: string,

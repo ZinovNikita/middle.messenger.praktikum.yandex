@@ -1,7 +1,6 @@
 import Component from '../components/component';
 import Sidebar from '../components/sidebar';
 import Chat from '../components/chat';
-import api from '../api';
 const chatsTemplate:string = '';
 export default <ViewConstructor> class Chats extends Component {
     constructor () {

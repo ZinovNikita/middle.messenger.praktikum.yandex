@@ -33,7 +33,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
                 } else {
                     return target[prop];
                 }
-            },
+            }
         }
         this.data = new Proxy({},proxyProps)
         Object.assign(this.attrs, options.attrs);
@@ -95,9 +95,11 @@ export default class Component<T extends ComponentOptionsType = {}> {
     public get $el ():Element {
         return this.element;
     }
+
     public get $router ():RouterType {
         return Component.$router;
     }
+
     public get $store ():StoreType {
         return Component.$store;
     }

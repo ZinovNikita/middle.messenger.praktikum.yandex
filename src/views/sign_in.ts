@@ -14,14 +14,13 @@ export default <ViewConstructor> class SignIn extends Modal {
                 cancel_title: 'Регистрация'
             },
             events: {
-                open:()=>{
+                open: () => {
                     this.$title = 'Вход';
                 },
-                cancel:()=>{
-                    console.log(this)
+                cancel: () => {
                     this.$router.$go('/sign-up')
                 },
-                done:(result:boolean, fvalues?:object|undefined)=>{
+                done: (result:boolean, fvalues?:object|undefined) => {
                     if (result) {
                         console.log('Вход', fvalues);
                         this.$router.$go('/messenger')
@@ -62,14 +61,12 @@ export default <ViewConstructor> class SignIn extends Modal {
                                 success &&= msg.length === 0;
                                 this.$field_error(k, msg);
                             }
-                            if(success===true){
-                                api.auth.$signIn(this.fvalues as SignInParams).then(res=>{
+                            if (success === true) {
+                                api.auth.$signIn(this.fvalues as SignInParams).then(res => {
                                     this.$store.$set('user',res);
                                     resolve(success);
-                                }).catch(()=>{resolve(false)})
-                                return;
-                            }
-                            else { resolve(success); }
+                                }).catch(() => { resolve(false) })
+                            } else { resolve(success); }
                         }
                     });
                 }
