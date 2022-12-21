@@ -1,12 +1,65 @@
+import api from '../api';
 import Component from '../components/component';
 import Modal from './modal';
 const chatTemplate:string = `
 <header class="chat-header">
-<a aria-label="Информация о собеседнике" id="profile-info" style="display:flex;" {{on 'click' 'openProfileInfo'}}>
-    <img alt="Аватар собеседника" class="chat-image" src="{{avatar}}"/>
-    <b style="align-self: center;font-size:18px">{{first_name}} {{second_name}}</b>
+<a aria-label="Информация о собеседнике" id="profile-info" style="display:flex;">
+    <img alt="Аватар чата" class="chat-image" src="{{resourceUrl avatar}}"/>
+    <b style="align-self: center;font-size:18px">{{title}}</b>
 </a>
+<button class="chat-settings btn-dark" {{on 'click' 'toggleSettings'}}>
+{{#if showSettings}}&times;{{else}}&equiv;{{/if}}
+</button>
 </header>
+{{#if showSettings}}
+<settings class="settings">
+{{#if archive}}
+<button title="Разархивировать чат" {{on 'click' 'unarchiveChat' id}}>Разархивировать</button>
+{{else}}
+<button title="Архивировать чат" {{on 'click' 'archiveChat' id}}>Архивировать</button>
+{{/if}}
+<button title="Удалить чат" {{on 'click' 'deleteChat' id}}>Удалить</button>
+<label title="Выбрать аватар" class="btn">
+    <input type="file" accept="image/*" {{on 'change' 'changeAvatar' id}}/>
+    Выбрать аватар
+</label><br><br>
+<label>Список пользователей:</label>
+<form class="inline" {{on 'submit' 'searchUsers'}} style="max-width:300px">
+    <input type="text" name="searchLogin" value="{{searchLogin}}" placeholder="Логин">
+    <button type="submit">Найти</button>
+</form>
+<ul class="user-list">
+{{#userSearch}}
+    <li>
+    {{#if_eq id ../created_by}}{{else}}
+        <a {{on 'click' 'openProfileInfo' id}}>
+            <img alt="Аватар собеседника" class="chat-image" src="{{resourceUrl avatar}}"/>
+            <span>{{display_name}} ({{login}})</span>
+        </a>
+        <button title="Включить пользователя" {{on 'click' 'includeUser' id}}>&oplus;</button>
+    {{/if_eq}}
+    </li>
+{{/userSearch}}
+Уже состоят в чате:
+{{#users}}
+    <li>
+    {{#if_eq id ../created_by}}
+        <a>
+            <img alt="Аватар собеседника" class="chat-image" src="{{resourceUrl avatar}}"/>
+            <span>{{display_name}} ({{role}})</span>
+        </a>
+    {{else}}
+        <a {{on 'click' 'openProfileInfo' id}}>
+            <img alt="Аватар собеседника" class="chat-image" src="{{resourceUrl avatar}}"/>
+            <span>{{display_name}} ({{role}})</span>
+        </a>
+        <button title="Исключить пользователя" {{on 'click' 'excludeUser' id}}>&otimes;</button>
+    {{/if_eq}}
+    </li>
+{{/users}}
+</ul>
+</settings>
+{{else}}
 <main id="{{uid}}-message-list" class="chat-messages">
 {{#messages}}
     {{#if my}}
@@ -14,17 +67,17 @@ const chatTemplate:string = `
     {{else}}
     <article class="message-block left">
     {{/if}}
-    <div class="message-item">
-        <b class="message-title">{{title}}</b>
-        <div class="message-images">
-        {{#images}}
-            <img alt="{{alt}}" src="{{url}}"/>
-        {{/images}}
+        <div class="message-item">
+            <b class="message-title">{{title}}</b>
+            <div class="message-images">
+            {{#images}}
+                <img alt="{{alt}}" src="{{url}}"/>
+            {{/images}}
+            </div>
+            <div class="message-body">{{body}}</div>
+            <small class="message-time">{{time}}</small>
         </div>
-        <div class="message-body">{{body}}</div>
-        <small class="message-time">{{time}}</small>
-    </div>
-</article>
+    </article>
 {{/messages}}
 </main>
 <footer class="chat-input-box">
@@ -41,7 +94,8 @@ const chatTemplate:string = `
         </label>
         <input type="submit" disabled value="Отправить"/>
     </form>
-</footer>`;
+</footer>
+{{/if}}`;
 const messages:{[id:string]:Obj[]} = {
     1: [{
         title: 'Иванов Иван',
@@ -65,10 +119,11 @@ const messages:{[id:string]:Obj[]} = {
     2: []
 }
 export default class Chat extends Component {
-    constructor () {
+    constructor (events:ObjFunc = {}) {
         super(chatTemplate,'div',{
             props: { className: 'chat-box' },
             events: {
+                ...events,
                 'html-update': () => {
                     this.$emit('scrollEnd');
                 },
@@ -78,15 +133,19 @@ export default class Chat extends Component {
                         el.scrollTo(0,el.scrollHeight);
                     }
                 },
-                open: (chat: Obj) => {
+                open: (chat: Obj,archive:boolean) => {
+                    console.log(chat);
                     this.$el.innerHTML = '';
                     this.message = '';
-                    Object.assign(this.data, chat);
-                    Object.assign(this.data, {
+                    this.chatId = chat.id
+                    Object.assign(this.data, Object.assign(chat, {
                         messages: [],
                         message: '',
-                        images: []
-                    });
+                        images: [],
+                        users: [],
+                        showSettings: false,
+                        archive
+                    }));
                     setTimeout(() => {
                     // loading messages from server
                         const msgs:Obj[] = messages[chat.id as keyof typeof messages];
@@ -139,6 +198,7 @@ export default class Chat extends Component {
 
     private messages: Obj[] = [];
     private message: string = '';
+    private chatId: number = 0;
     private profileInfoModal: Modal;
     // @ts-ignore - used after template compilation from element events
     private openProfileInfo () {
@@ -205,11 +265,89 @@ export default class Chat extends Component {
     }
 
     // @ts-ignore - used after template compilation from element events
+    private archiveChat (event:Event,chatId:number) {
+        api.chats.$archive(chatId).then((chat:Obj) => {
+            Object.assign(this.data, chat);
+            this.$emit('update-chat-list');
+        })
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private unarchiveChat (event:Event,chatId:number) {
+        api.chats.$unarchive(chatId).then((chat:Obj) => {
+            Object.assign(this.data, chat);
+            this.$emit('update-chat-list');
+        })
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private deleteChat (event:Event,chatId:number) {
+        api.chats.$delete(chatId)
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private changeAvatar (event:Event,chatId:number) {
+        const tg:HTMLInputElement = <HTMLInputElement>event.target
+        if (!tg || !tg.files) return
+        api.chats.$avatar(chatId, tg.files[0]).then((chat:Obj) => {
+            Object.assign(this.data, chat);
+            this.$emit('update-chat-list');
+        })
+    }
+
+    // @ts-ignore - used after template compilation from element events
     private addFile (event:Event) {
-        this.fileToBase64(<FileList>(<any>event.target).files).then((images:Obj[]) => {
+        this.fileToBase64(<FileList>(<HTMLInputElement>event.target).files).then((images:Obj[]) => {
             Object.assign(this.data,{ images, message: this.message });
             // message validation
             (<HTMLInputElement> this.$find('#message-form>input[type=submit]')).disabled = (this.message.length === 0);
+        })
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private toggleSettings () {
+        this.data.showSettings = !this.data.showSettings;
+        if (this.data.showSettings === true) {
+            api.chats.$users(this.chatId).then((res:Obj[]) => {
+                this.data.users = res;
+            })
+        }
+        Object.assign(this.data, {
+
+        });
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private searchUsers (event:Event) {
+        event.preventDefault();
+        const login = (<HTMLFormElement>event.target).searchLogin.value;
+        if (!login || login.length === 0) { this.data.userSearch = [] } else {
+            api.users.$search(login).then((res:Obj[]) => {
+                this.data.userSearch = res;
+                this.data.searchLogin = login;
+                (<HTMLInputElement>event.target).focus()
+            })
+        }
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private includeUser (event:Event,userId:number) {
+        event.preventDefault();
+        api.chats.$includeUser(this.chatId,[userId]).then(() => {
+            this.data.userSearch = this.data.userSearch.filter(u => u.id !== userId)
+            api.chats.$users(this.chatId).then((res:Obj[]) => {
+                this.data.users = res;
+            })
+        })
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private excludeUser (event:Event,userId:number) {
+        event.preventDefault();
+        api.chats.$excludeUser(this.chatId,[userId]).then(() => {
+            api.chats.$users(this.chatId).then((res:Obj[]) => {
+                this.data.users = res;
+            })
         })
     }
 }

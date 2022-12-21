@@ -103,6 +103,21 @@ $placeholder-color: #ddd;
                 }
             }
         }
+
+        > .new-chat-btn {
+            position: fixed;
+            bottom: 10px;
+            left: 340px;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 0.5;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
     }
 
     > .chat-box {
@@ -123,6 +138,34 @@ $placeholder-color: #ddd;
                 display: block;
                 align-self: center;
                 margin: 10px;
+            }
+
+            > .chat-settings {
+                font-size: 30px;
+            }
+        }
+
+        > .settings {
+            padding: 20px;
+
+            .user-list {
+                flex-flow: column;
+                align-content: flex-start;
+                display: flex;
+                align-items: center;
+
+                >li {
+                    flex: auto;
+                    justify-content: space-between;
+                    align-self: stretch;
+                    display: flex;
+                    align-items: center;
+
+                    >a {
+                        display: flex;
+                        align-items: center;
+                    }
+                }
             }
         }
 

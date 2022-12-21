@@ -68,8 +68,7 @@ export default class Users {
                 const user = (r as UserType);
                 this.store.$set('user',user)
                 resolve(`${this.host}/api/v2/resources/${user.avatar || ''}`);
-            })
-                .catch(reject)
+            }).catch(reject)
         })
     }
 

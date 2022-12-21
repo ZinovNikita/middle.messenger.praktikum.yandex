@@ -1,4 +1,4 @@
-import ChatsPage from './views/chats';
+import MessengerPage from './views/messenger';
 import ErrorPage from './views/error';
 import SignUpPage from './views/sign_up';
 import SignInPage from './views/sign_in';
@@ -19,7 +19,7 @@ class Application {
         Component.$router
             .$use('/',SignInPage)
             .$use('/sign-up',SignUpPage)
-            .$use('/messenger',ChatsPage)
+            .$use('/messenger',MessengerPage)
             .$use('/404',ErrorPage, { status: 404, title: 'Страница не найдена', message: 'Страница не найдена' })
             .$use('/500',ErrorPage, { status: 500, title: 'Возникла ошибка на сервере', message: 'Возникла ошибка на сервере' })
         api.auth.$user().then(() => {

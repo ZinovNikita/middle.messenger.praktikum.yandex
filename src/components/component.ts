@@ -60,11 +60,11 @@ export default class Component<T extends ComponentOptionsType = {}> {
             if (el !== null) {
                 el.removeAttribute(`data-event${o.selector}`);
                 this.eventBus.$off(`sub.${o.selector}`);
-                this.eventBus.$on(`sub.${o.selector}`,(event:Event) => {
-                    if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event) }
+                this.eventBus.$on(`sub.${o.selector}`,(event:Event,params:any[]) => {
+                    if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event,...params) }
                 })
                 el.addEventListener(o.name as string, (event:Event) => {
-                    this.$emit(`sub.${o.selector}`,event);
+                    this.$emit(`sub.${o.selector}`,event,o.params);
                 });
             }
         })
@@ -129,9 +129,10 @@ export default class Component<T extends ComponentOptionsType = {}> {
         this.$addHelper('resourceUrl', (path:string) => {
             return new Handlebars.SafeString(api.resourceUrl(path));
         });
-        this.$addHelper('on', (name:string, funcName:string) => {
+        this.$addHelper('on', (name:string, funcName:string, ...params:unknown[]) => {
+            if (params.length > 0) { params.pop() }
             const eid:string = `${this.$uid}-${++eventId}`;
-            this.elementEvents.push({ selector: eid, name, funcName })
+            this.elementEvents.push({ selector: eid, name, funcName, params })
             return new Handlebars.SafeString(`data-event${eid}="${eid}"`);
         });
         this.$addHelper('route', (pathname:string) => {

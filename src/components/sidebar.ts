@@ -2,18 +2,19 @@ import Component from './component';
 import Modal from '../components/modal';
 import api from '../api';
 const sidebarTemplate:string = `
-<form id="search-form" class="search-box inline" {{on 'submit' 'onSearch'}} >
-    <input id="{{uid}}-chat-search" type="text" name="chatSearch" class="search-input" placeholder="Поиск" value="{{chatSearch}}"/>
+<form class="search-box inline" {{on 'submit' 'onSearch'}} >
+    <input type="text" name="chatSearch" class="search-input" placeholder="Поиск" value="{{chatSearch}}"/>
+    <button type="button" title="Архив" {{on 'click' 'toogleArchive'}}>{{#if archive}}&check;{{else}}&cross;{{/if}} архив</button>
     <img alt="Профиль" title="Профиль" class="profile-image" src="{{resourceUrl avatar}}" {{on 'click' 'openProfile'}}/>
     <sup class="logout" {{on 'click' 'logoutProfile'}} title="Выйти из приложения">&#8855;</sup>
 </form>
-<ul class="chat-list" {{on 'click' 'chatSelect'}}>
+<ul class="chat-list">
 {{#chats}}
 {{#if_filtred title ../chatSearch}}
     {{#if active}}
-    <li chat-id="{{id}}" class="chat-item active">
+    <li class="chat-item active" {{on 'click' 'chatSelect' id}}>
     {{else}}
-    <li chat-id="{{id}}" class="chat-item">
+    <li class="chat-item" {{on 'click' 'chatSelect' id}}>
     {{/if}}
         <img alt="Аватар {{title}}" class="chat-image" src="{{resourceUrl avatar}}"/>
         <div class="chat-text">
@@ -30,10 +31,21 @@ const sidebarTemplate:string = `
     </li>
 {{/if_filtred}}
 {{/chats}}
-</ul>`;
+</ul>
+<button class="btn-circle btn-dark new-chat-btn" {{on 'click' 'createNewChat'}}>&plus;</button>`;
 export default class Sidebar extends Component {
     constructor (events:ObjFunc = {}) {
-        super(sidebarTemplate,'nav',{ props: { className: 'sidebar' }, events });
+        super(sidebarTemplate,'nav',{
+            props: { className: 'sidebar' },
+            events: {
+                ...events,
+                'load-chat-list': () => {
+                    api.chats.$chat_list().then(() => {
+                        this.data.chats = this.$store.$get('chat_list')
+                    })
+                }
+            }
+        });
         this.profileEditModal = new Modal({
             data: {
                 title: 'Профиль',
@@ -180,9 +192,6 @@ export default class Sidebar extends Component {
             }
         });
         this.data.avatar = this.avatar
-        api.chats.$chat_list().then(() => {
-            this.data.chats = this.$store.$get('chat_list')
-        })
         this.$addHelper('if_filtred', function (this:any, title:string, srch:string, opts:any) {
             if (!srch || srch.length === 0) {
                 return opts.fn(this);
@@ -192,6 +201,7 @@ export default class Sidebar extends Component {
                 return opts.inverse(this);
             }
         });
+        this.$emit('load-chat-list')
     }
 
     private get avatar () {
@@ -211,8 +221,10 @@ export default class Sidebar extends Component {
     // @ts-ignore - used after template compilation from element events
     private onSearch (event:Event) {
         event.preventDefault();
-        api.chats.$chat_list(0,(<HTMLFormElement>event.target).chatSearch.value).then(() => {
+        const str = (<HTMLFormElement>event.target).chatSearch.value;
+        api.chats.$chat_list(0,str,this.data.archive === true).then(() => {
             this.data.chats = this.$store.$get('chat_list')
+            this.data.chatSearch = str
         })
     }
 
@@ -229,12 +241,27 @@ export default class Sidebar extends Component {
     }
 
     // @ts-ignore - used after template compilation from element events
-    private chatSelect (event:Event) {
-        const target = (<HTMLElement>event.target).closest('.chat-item');
-        if (target !== null) {
-            const chId = Number(target.getAttribute('chat-id'));
-            this.activate(chId);
-            this.$emit('chat-open',chId)
-        }
+    private chatSelect (event:Event,chId:number) {
+        this.activate(chId);
+        this.$emit('chat-open',chId,this.data.archive)
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private toogleArchive (event:Event) {
+        event.preventDefault();
+        this.data.archive = !this.data.archive;
+        api.chats.$chat_list(0,'',this.data.archive === true).then(() => {
+            this.data.chats = this.$store.$get('chat_list')
+            this.data.chatSearch = ''
+        })
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private createNewChat () {
+        let title;
+        while (title === null || title === undefined || title === '') { title = prompt('Укажите название чата'); }
+        api.chats.$create(title).then(() => {
+            this.data.chats = this.$store.$get('chat_list')
+        })
     }
 }
