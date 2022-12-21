@@ -9,6 +9,7 @@ type ChatsType = {
     $avatar:Function,
     $includeUser:Function,
     $excludeUser:Function,
+    $token:Function,
 }
 export default class Chats {
     private host:string = '';
@@ -121,6 +122,15 @@ export default class Chats {
                 'Content-Type': 'application/json'
             },
             params: { chatId,users }
+        })
+    }
+
+    public $token (chatId:number):Promise<unknown> {
+        return fetch2.$post(`${this.host}/api/v2/chats/token/${chatId}`,{
+            headers: {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            }
         })
     }
 }

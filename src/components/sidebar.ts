@@ -12,7 +12,7 @@ const sidebarTemplate:string = `
 {{#chats}}
 {{#if_filtred title ../chatSearch}}
     {{#if active}}
-    <li class="chat-item active" {{on 'click' 'chatSelect' id}}>
+    <li class="chat-item active">
     {{else}}
     <li class="chat-item" {{on 'click' 'chatSelect' id}}>
     {{/if}}
@@ -68,7 +68,7 @@ export default class Sidebar extends Component {
                     this.profileEditModal.data.fields = [];
                     api.auth.$user().then((res:any) => {
                         this.profileEditModal.data.fields = [
-                            { label: 'Аватар', type: 'avatar', name: 'avatar', value: api.resourceUrl(res.avatar) },
+                            { label: 'Аватар', type: 'avatar', name: 'avatar', value: api.resources.$url(res.avatar) },
                             { label: 'Имя', type: 'text', name: 'first_name', value: res.first_name },
                             { label: 'Фамилия', type: 'text', name: 'second_name', value: res.second_name },
                             { label: 'Псевдоним', type: 'text', name: 'display_name', value: res.display_name },
@@ -205,8 +205,7 @@ export default class Sidebar extends Component {
     }
 
     private get avatar () {
-        if (this.$store.$has('user')) { return this.$store.$get('user').avatar }
-        return ''
+        return this.$currentUser?.avatar || ''
     }
 
     private profileEditModal:Modal;

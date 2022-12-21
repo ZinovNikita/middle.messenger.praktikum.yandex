@@ -107,6 +107,10 @@ export default class Component<T extends ComponentOptionsType = {}> {
     public get $uid ():string {
         return this.uid;
     }
+    public get $currentUser ():UserType|null {
+        if (this.$store.$has('user')) { return this.$store.$get('user') }
+        return null
+    }
 
     public $compile () {
         let eventId = 0;
@@ -127,7 +131,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
             }
         });
         this.$addHelper('resourceUrl', (path:string) => {
-            return new Handlebars.SafeString(api.resourceUrl(path));
+            return new Handlebars.SafeString(api.resources.$url(path));
         });
         this.$addHelper('on', (name:string, funcName:string, ...params:unknown[]) => {
             if (params.length > 0) { params.pop() }

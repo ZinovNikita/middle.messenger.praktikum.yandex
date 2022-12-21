@@ -1,6 +1,7 @@
 import api from '../api';
 import Component from '../components/component';
 import Modal from './modal';
+import Socket from '../utils/socket';
 const chatTemplate:string = `
 <header class="chat-header">
 <a aria-label="Информация о собеседнике" id="profile-info" style="display:flex;">
@@ -62,20 +63,19 @@ const chatTemplate:string = `
 {{else}}
 <main id="{{uid}}-message-list" class="chat-messages">
 {{#messages}}
-    {{#if my}}
-    <article class="message-block right">
-    {{else}}
-    <article class="message-block left">
-    {{/if}}
+    <article class="message-block {{#if_eq user_id ../currentUserId}}right{{else}}left{{/if_eq}}">
         <div class="message-item">
             <b class="message-title">{{title}}</b>
+        {{#if_eq type 'file'}}
             <div class="message-images">
-            {{#images}}
-                <img alt="{{alt}}" src="{{url}}"/>
-            {{/images}}
+            {{#file}}
+                <img alt="{{filename}}" src="{{resourceUrl path}}"/>
+            {{/file}}
             </div>
-            <div class="message-body">{{body}}</div>
-            <small class="message-time">{{time}}</small>
+        {{else}}
+            <div class="message-body">{{content}}</div>
+        {{/if_eq}}
+            <small class="message-time">{{msgTime time}}</small>
         </div>
     </article>
 {{/messages}}
@@ -96,28 +96,6 @@ const chatTemplate:string = `
     </form>
 </footer>
 {{/if}}`;
-const messages:{[id:string]:Obj[]} = {
-    1: [{
-        title: 'Иванов Иван',
-        body: 'Text1',
-        time: new Date().toLocaleTimeString(),
-        images: [{
-            alt: 'foto1',
-            url: `https://thispersondoesnotexist.com/image?q=${new Date().getTime()}`
-        }],
-        my: false
-    },{
-        title: 'Зинов Никита',
-        body: 'Text2',
-        time: new Date().toLocaleTimeString(),
-        images: [{
-            alt: 'foto2',
-            url: `https://thispersondoesnotexist.com/image?q=${new Date().getTime()}`
-        }],
-        my: true
-    }],
-    2: []
-}
 export default class Chat extends Component {
     constructor (events:ObjFunc = {}) {
         super(chatTemplate,'div',{
@@ -146,30 +124,26 @@ export default class Chat extends Component {
                         showSettings: false,
                         archive
                     }));
-                    setTimeout(() => {
-                    // loading messages from server
-                        const msgs:Obj[] = messages[chat.id as keyof typeof messages];
-                        this.messages = new Proxy(msgs,{
-                            get: (target:any, prop:string) => {
-                                if (prop === 'push') {
-                                    this.data.messages = target.sort((a:Obj,b:Obj) => {
-                                        if (a > b) return 1;
-                                        else if (a < b) return -1;
-                                        return 0;
-                                    });
-                                }
-                                return target[prop];
-                            },
-                            set: (target:any, prop:string,val:any) => {
-                                target[prop] = val;
-                                this.data.messages = target;
-                                return true;
-                            }
+                    api.chats.$token(this.chatId).then((r)=>{
+                        if(this.$currentUser===null) return;
+                        this.data.currentUserId = this.$currentUser.id;
+                        this.socket = new Socket(this.$currentUser.id,this.chatId,r.token);
+                        this.socket.addEventListener("open",()=>{
+                            this.socket.$getMessages(0).then((res)=>{
+                                this.data.messages = res;
+                                console.log(this.data.messages)
+                            }).catch(console.error)
                         })
-                        Object.assign(this.messages,msgs);
-                    },500)
+                    })
                 }
             }
+        });
+        this.$addHelper('msgTime', (time:string) => {
+            let msgDate = new Date(time);
+            let today = new Date()
+            if(today.toDateString() === msgDate.toDateString())
+                return msgDate.toLocaleTimeString()
+            return msgDate.toLocaleString();
         });
         this.profileInfoModal = new Modal({
             data: {
@@ -199,60 +173,30 @@ export default class Chat extends Component {
     private messages: Obj[] = [];
     private message: string = '';
     private chatId: number = 0;
+    private socket: Socket;
     private profileInfoModal: Modal;
     // @ts-ignore - used after template compilation from element events
     private openProfileInfo () {
         this.profileInfoModal.$open();
     }
 
-    private fileToBase64 (files:FileList) {
-        return new Promise<Obj[]>((resolve) => {
-            const images:Obj[] = [];
-            const fileLoader = (i:number) => {
-                if (i >= files.length) { return resolve(images) }
-                const reader = new FileReader();
-                const f = files.item(i);
-                if (f !== null) {
-                    const url = URL.createObjectURL(f);
-                    reader.readAsDataURL(f);
-                    reader.onload = () => {
-                        images.push({
-                            alt: f?.name,
-                            url,
-                            data: reader.result
-                        });
-                        fileLoader(i + 1);
-                    };
-                    reader.onerror = () => {
-                        fileLoader(i + 1);
-                    };
-                } else { fileLoader(i + 1); }
-            }
-            fileLoader(0);
-        });
-    }
-
     // @ts-ignore - used after template compilation from element events
     private sendMessage (event:Event) {
         event.preventDefault();
         const form = <HTMLFormElement>event.target;
-        console.log('Сообщение',{
-            message: form.message.value,
-            images: this.data.images
-        });
-        setTimeout(() => {
-            // send to server
-            this.messages.push({
-                title: 'Зинов Никита',
-                body: form.message.value,
-                time: new Date().toLocaleTimeString(),
-                images: this.data.images,
-                my: true
+        this.socket.$sendMessage(form.message.value).then((res)=>{
+            this.data.messages.push(res);
+        }).catch(console.error)
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private addFile (event:Event) {
+        let files = (<HTMLInputElement>event.target).files;
+        if(files===null) return;
+        api.resources.$add(files[0]).then((r:Obj)=>{
+            this.socket.$sendImage(r.id).then((res)=>{
+                this.data.messages.push(res);
             })
-            this.data.images = [];
-            this.message = '';
-            this.data.message = '';
-            this.$emit('scrollEnd');
         })
     }
 
@@ -296,15 +240,6 @@ export default class Chat extends Component {
     }
 
     // @ts-ignore - used after template compilation from element events
-    private addFile (event:Event) {
-        this.fileToBase64(<FileList>(<HTMLInputElement>event.target).files).then((images:Obj[]) => {
-            Object.assign(this.data,{ images, message: this.message });
-            // message validation
-            (<HTMLInputElement> this.$find('#message-form>input[type=submit]')).disabled = (this.message.length === 0);
-        })
-    }
-
-    // @ts-ignore - used after template compilation from element events
     private toggleSettings () {
         this.data.showSettings = !this.data.showSettings;
         if (this.data.showSettings === true) {
@@ -312,9 +247,6 @@ export default class Chat extends Component {
                 this.data.users = res;
             })
         }
-        Object.assign(this.data, {
-
-        });
     }
 
     // @ts-ignore - used after template compilation from element events

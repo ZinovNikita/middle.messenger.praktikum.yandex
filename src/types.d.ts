@@ -22,6 +22,16 @@ declare type StoreType = {
     $remove: Function,
     $get: Function,
 }
+declare type UserType = {
+    id:number,
+    first_name:string,
+    second_name:string,
+    display_name?:string,
+    login:string,
+    email:string,
+    phone:string,
+    avatar?:string,
+}
 declare type ComponentType = {
     attrs: Obj,
     props: Obj,
@@ -40,6 +50,7 @@ declare type ComponentType = {
     $off: Function,
     $router: RouterType,
     $store: StoreType,
+    $currentUser: UserType|null,
 }
 declare type ObjComponentType = {[id:string]:ComponentType}
 declare type Fetch2OptionsType = {
@@ -82,15 +93,6 @@ declare type SignUpParams = {
 declare type SignInParams = {
     login: string,
     password: string,
-}
-declare type UserType = {
-    first_name:string|null,
-    second_name:string|null,
-    display_name:string|null,
-    login:string|null,
-    email:string|null,
-    phone:string|null,
-    avatar?:string|null,
 }
 declare type ChatType = {
     id: number,
