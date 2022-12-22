@@ -19,12 +19,6 @@ export default <ViewConstructor> class SignIn extends Modal {
                 },
                 cancel: () => {
                     this.$router.$go('/sign-up')
-                },
-                done: (result:boolean, fvalues?:object|undefined) => {
-                    if (result) {
-                        console.log('Вход', fvalues);
-                        this.$router.$go('/messenger')
-                    }
                 }
             },
             methods: {

@@ -116,7 +116,6 @@ export default class Chat extends Component {
                     }
                 },
                 open: (chat: Obj,archive:boolean) => {
-                    console.log(chat);
                     this.$el.innerHTML = '';
                     this.message = '';
                     this.chatId = chat.id

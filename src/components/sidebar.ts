@@ -54,10 +54,6 @@ export default class Sidebar extends Component {
                 }]
             },
             events: {
-                done: (result:boolean,fvalues?:Obj|undefined) => {
-                    // update profile on server
-                    console.log('Профиль',result,fvalues);
-                },
                 open: () => {
                     this.profileEditModal.data.fields = [];
                     api.auth.$user().then((res:any) => {
@@ -143,12 +139,6 @@ export default class Sidebar extends Component {
                 ],
                 ok_title: 'Сохранить',
                 cancel_title: 'Отмена'
-            },
-            events: {
-                done: (result:boolean,fvalues?:Obj|undefined) => {
-                    // update profile on server
-                    console.log('Профиль',result,fvalues);
-                }
             },
             methods: {
                 validator (this:Modal,key:string|undefined) {

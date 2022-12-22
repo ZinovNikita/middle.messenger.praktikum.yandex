@@ -27,7 +27,6 @@ export default <ViewConstructor> class SignUp extends Modal {
                 },
                 done: (result:boolean, fvalues?:SignUpParams) => {
                     if (result === true) {
-                        console.log('Регистрация', fvalues);
                         this.$router.$go('/messenger')
                     }
                 }
@@ -90,10 +89,8 @@ export default <ViewConstructor> class SignUp extends Modal {
                             }
                             if (success === true) {
                                 api.auth.$signUp(this.fvalues as SignUpParams).then(res => {
-                                    console.log(res);
                                     resolve(success);
-                                }).catch((...p) => {
-                                    console.error(p);
+                                }).catch(() => {
                                     resolve(false)
                                 })
                                 return;
