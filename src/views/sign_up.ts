@@ -25,7 +25,7 @@ export default <ViewConstructor> class SignUp extends Modal {
                 cancel: () => {
                     this.$router.$go('/')
                 },
-                done: (result:boolean, fvalues?:SignUpParams) => {
+                done: (result:boolean) => {
                     if (result === true) {
                         this.$router.$go('/messenger')
                     }
