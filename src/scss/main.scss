@@ -37,6 +37,8 @@ $placeholder-color: #ddd;
     align-content: flex-start;
 
     .chat-image {
+        max-height: 50px;
+        max-width: 50px;
         height: 50px;
         margin: 10px;
         width: auto;
@@ -52,13 +54,20 @@ $placeholder-color: #ddd;
         border-right: $default-border;
 
         > .search-box {
-            height: 50px;
             border-bottom: $default-border;
-            padding: 10px 5px;
+            padding: 5px;
 
-            > .profile {
-                max-width: 80px;
-                margin-left: 0;
+            > .logout {
+                max-width: 15px;
+                margin: 0;
+                cursor: pointer;
+            }
+
+            .profile-image {
+                height: 50px;
+                margin: 0;
+                max-width: 50px;
+                border-radius: 50%;
             }
         }
 
@@ -94,6 +103,21 @@ $placeholder-color: #ddd;
                 }
             }
         }
+
+        > .new-chat-btn {
+            position: fixed;
+            bottom: 10px;
+            left: 340px;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 0.5;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
     }
 
     > .chat-box {
@@ -114,6 +138,34 @@ $placeholder-color: #ddd;
                 display: block;
                 align-self: center;
                 margin: 10px;
+            }
+
+            > .chat-settings {
+                font-size: 30px;
+            }
+        }
+
+        > .settings {
+            padding: 20px;
+
+            .user-list {
+                flex-flow: column;
+                align-content: flex-start;
+                display: flex;
+                align-items: center;
+
+                >li {
+                    flex: auto;
+                    justify-content: space-between;
+                    align-self: stretch;
+                    display: flex;
+                    align-items: center;
+
+                    >a {
+                        display: flex;
+                        align-items: center;
+                    }
+                }
             }
         }
 
@@ -149,6 +201,7 @@ $placeholder-color: #ddd;
             display: flex;
             flex-flow: column nowrap;
             margin-top: auto;
+            flex-direction: column;
 
             > .message-block {
                 display: flex;
@@ -183,6 +236,8 @@ $placeholder-color: #ddd;
                         text-align: right;
                         margin-top: 5px;
                         display: block;
+                        font-size: 10px;
+                        color: #888;
                     }
                 }
 

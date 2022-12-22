@@ -55,9 +55,25 @@ class Fetch2 {
         return new Promise(function (resolve, reject) {
             try {
                 const xhr = new XMLHttpRequest();
-                xhr.open(options.method, url);
+                xhr.open(options.method || 'GET', url);
+                xhr.withCredentials = true;
+                if (options.headers !== undefined) {
+                    for (const k in options.headers) { xhr.setRequestHeader(k, options.headers[k]) }
+                }
                 xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 300) { resolve(xhr.response); } else {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        const resCt = xhr.getResponseHeader('content-type');
+                        if (resCt !== undefined && resCt !== null && resCt.indexOf('application/json') >= 0) {
+                            try {
+                                resolve(JSON.parse(xhr.response));
+                            } catch (err:any) {
+                                reject({
+                                    status: xhr.status,
+                                    statusText: err.message
+                                });
+                            }
+                        } else { resolve(xhr.response); }
+                    } else {
                         reject({
                             status: xhr.status,
                             statusText: xhr.statusText

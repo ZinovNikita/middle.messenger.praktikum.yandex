@@ -1,5 +1,6 @@
 import Handlebars, { HelperDelegate } from 'handlebars';
 import EventBus from './event_bus';
+import api from '../api';
 export default class Component<T extends ComponentOptionsType = {}> {
     constructor (template:string, tagName:string = 'div', options:T) {
         this.element = document.createElement(tagName);
@@ -20,18 +21,24 @@ export default class Component<T extends ComponentOptionsType = {}> {
                 return true;
             }
         })
-        this.eventBus.$on('html-update', () => this.eventsBuild())
-        this.data = new Proxy({},{
+        const proxyProps:ProxyHandler<any> = {
             set: (target:any, prop:string, val: any) => {
                 target[prop] = val;
-                this.element.innerHTML = this.$compile(target);
-                this.$emit('html-update')
+                this.$compile();
                 return true;
+            },
+            get: (target:any, prop:string) => {
+                if (typeof target[prop] === 'object' && target[prop] !== null) {
+                    return new Proxy(target[prop], proxyProps)
+                } else {
+                    return target[prop];
+                }
             }
-        })
+        }
+        this.data = new Proxy({},proxyProps)
         Object.assign(this.attrs, options.attrs);
         Object.assign(this.props, options.props);
-        Object.assign(this.data, options.data);
+        Object.assign(this.data, options.data)
         Object.assign(this.events, options.events);
         Object.assign(this.methods, options.methods);
         this.props.id = this.uid;
@@ -52,15 +59,21 @@ export default class Component<T extends ComponentOptionsType = {}> {
             const el = this.$find(`*[data-event${o.selector}="${o.selector}"]`);
             if (el !== null) {
                 el.removeAttribute(`data-event${o.selector}`);
-                this.eventBus.$off(`sub.${o.selector}.${o.name}`);
-                this.eventBus.$on(`sub.${o.selector}.${o.name}`,(event:Event) => {
-                    if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event) }
+                this.eventBus.$off(`sub.${o.selector}`);
+                this.eventBus.$on(`sub.${o.selector}`,(event:Event,params:any[]) => {
+                    if (typeof this[o.funcName as keyof this] === 'function') { (<Function> this[o.funcName as keyof this])(event,...params) }
                 })
                 el.addEventListener(o.name as string, (event:Event) => {
-                    this.$emit(`sub.${o.selector}.${o.name}`,event);
+                    this.$emit(`sub.${o.selector}`,event,o.params);
                 });
             }
         })
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private routeTo (event:Event) {
+        event.preventDefault();
+        this.$router.$go((event.target as HTMLElement).getAttribute('href'))
     }
 
     public $off (type:string):void {
@@ -71,22 +84,38 @@ export default class Component<T extends ComponentOptionsType = {}> {
         this.eventBus.$emit(type,...args);
     }
 
+    public $title: string = '';
     public attrs: Obj = {};
     public props: Obj = {};
     public data: Obj = {};
     public events: ObjFunc = {};
     public methods: ObjFunc = {};
+    public static $router: RouterType;
+    public static $store: StoreType;
     public get $el ():Element {
         return this.element;
+    }
+
+    public get $router ():RouterType {
+        return Component.$router;
+    }
+
+    public get $store ():StoreType {
+        return Component.$store;
     }
 
     public get $uid ():string {
         return this.uid;
     }
 
-    public $title: string = '';
-    public $compile (data:Obj) {
+    public get $currentUser ():UserType|null {
+        if (this.$store.$has('user')) { return this.$store.$get('user') }
+        return null
+    }
+
+    public $compile () {
         let eventId = 0;
+        this.elementEvents = [];
         this.$addHelper('if_eq', function (this:any, a:any, b:any, opts:any) {
             if (a === b) {
                 return opts.fn(this);
@@ -102,12 +131,23 @@ export default class Component<T extends ComponentOptionsType = {}> {
                 return opts.inverse(this);
             }
         });
-        this.$addHelper('on', (name:string, funcName:string) => {
+        this.$addHelper('resourceUrl', (path:string) => {
+            return new Handlebars.SafeString(api.resources.$url(path));
+        });
+        this.$addHelper('on', (name:string, funcName:string, ...params:unknown[]) => {
+            if (params.length > 0) { params.pop() }
             const eid:string = `${this.$uid}-${++eventId}`;
-            this.elementEvents.push({ selector: eid, name, funcName })
+            this.elementEvents.push({ selector: eid, name, funcName, params })
             return new Handlebars.SafeString(`data-event${eid}="${eid}"`);
         });
-        return Handlebars.compile(this.template).call(this,data);
+        this.$addHelper('route', (pathname:string) => {
+            const eid:string = `${this.$uid}-${++eventId}`;
+            this.elementEvents.push({ selector: eid, name: 'click', funcName: 'routeTo' })
+            return new Handlebars.SafeString(`data-event${eid}="${eid}" href="${pathname}"`);
+        });
+        this.element.innerHTML = Handlebars.compile(this.template).call(this,this.data);
+        this.eventsBuild()
+        this.$emit('html-update');
     }
 
     public $addHelper (name:string,cb:HelperDelegate) {
@@ -125,5 +165,10 @@ export default class Component<T extends ComponentOptionsType = {}> {
     public $attach (el: Element) {
         el.appendChild(this.element);
         this.$emit('attach');
+    }
+
+    public $hide () {
+        this.element.parentElement?.removeChild(this.element);
+        this.$emit('hide');
     }
 }
