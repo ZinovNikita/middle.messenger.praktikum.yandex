@@ -201,6 +201,7 @@ $placeholder-color: #ddd;
             display: flex;
             flex-flow: column nowrap;
             margin-top: auto;
+            flex-direction: column;
 
             > .message-block {
                 display: flex;
@@ -235,6 +236,8 @@ $placeholder-color: #ddd;
                         text-align: right;
                         margin-top: 5px;
                         display: block;
+                        font-size: 10px;
+                        color: #888;
                     }
                 }
 

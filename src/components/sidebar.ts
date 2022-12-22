@@ -10,12 +10,7 @@ const sidebarTemplate:string = `
 </form>
 <ul class="chat-list">
 {{#chats}}
-{{#if_filtred title ../chatSearch}}
-    {{#if active}}
-    <li class="chat-item active">
-    {{else}}
-    <li class="chat-item" {{on 'click' 'chatSelect' id}}>
-    {{/if}}
+    <li class="chat-item {{#if_eq id ../activeId}}active{{/if_eq}}" {{on 'click' 'chatSelect' id}}>
         <img alt="Аватар {{title}}" class="chat-image" src="{{resourceUrl avatar}}"/>
         <div class="chat-text">
             <b class="chat-title">
@@ -29,7 +24,6 @@ const sidebarTemplate:string = `
         {{/if}}
         </div>
     </li>
-{{/if_filtred}}
 {{/chats}}
 </ul>
 <button class="btn-circle btn-dark new-chat-btn" {{on 'click' 'createNewChat'}}>&plus;</button>`;
@@ -68,7 +62,7 @@ export default class Sidebar extends Component {
                     this.profileEditModal.data.fields = [];
                     api.auth.$user().then((res:any) => {
                         this.profileEditModal.data.fields = [
-                            { label: 'Аватар', type: 'avatar', name: 'avatar', value: api.resources.$url(res.avatar) },
+                            { label: 'Аватар', type: 'avatar', name: 'avatar', value: res.avatar },
                             { label: 'Имя', type: 'text', name: 'first_name', value: res.first_name },
                             { label: 'Фамилия', type: 'text', name: 'second_name', value: res.second_name },
                             { label: 'Псевдоним', type: 'text', name: 'display_name', value: res.display_name },
@@ -192,15 +186,6 @@ export default class Sidebar extends Component {
             }
         });
         this.data.avatar = this.avatar
-        this.$addHelper('if_filtred', function (this:any, title:string, srch:string, opts:any) {
-            if (!srch || srch.length === 0) {
-                return opts.fn(this);
-            } else if (`${title}`.indexOf(srch) >= 0) {
-                return opts.fn(this);
-            } else {
-                return opts.inverse(this);
-            }
-        });
         this.$emit('load-chat-list')
     }
 
@@ -211,10 +196,7 @@ export default class Sidebar extends Component {
     private profileEditModal:Modal;
     private passwordModal:Modal;
     private activate (id:number) {
-        this.data.chats = (<Obj[]> this.data.chats).map((ch:Obj) => {
-            ch.active = (ch.id === id)
-            return ch
-        })
+        this.data.activeId = id
     }
 
     // @ts-ignore - used after template compilation from element events

@@ -35,7 +35,7 @@ const chatTemplate:string = `
     {{#if_eq id ../created_by}}{{else}}
         <a {{on 'click' 'openProfileInfo' id}}>
             <img alt="Аватар собеседника" class="chat-image" src="{{resourceUrl avatar}}"/>
-            <span>{{display_name}} ({{login}})</span>
+            <span>{{first_name}} {{second_name}} ({{login}})</span>
         </a>
         <button title="Включить пользователя" {{on 'click' 'includeUser' id}}>&oplus;</button>
     {{/if_eq}}
@@ -45,14 +45,14 @@ const chatTemplate:string = `
 {{#users}}
     <li>
     {{#if_eq id ../created_by}}
-        <a>
+        <a {{on 'click' 'openProfileInfo' id}}>
             <img alt="Аватар собеседника" class="chat-image" src="{{resourceUrl avatar}}"/>
-            <span>{{display_name}} ({{role}})</span>
+            <span>{{first_name}} {{second_name}} ({{role}})</span>
         </a>
     {{else}}
         <a {{on 'click' 'openProfileInfo' id}}>
             <img alt="Аватар собеседника" class="chat-image" src="{{resourceUrl avatar}}"/>
-            <span>{{display_name}} ({{role}})</span>
+            <span>{{first_name}} {{second_name}} ({{role}})</span>
         </a>
         <button title="Исключить пользователя" {{on 'click' 'excludeUser' id}}>&otimes;</button>
     {{/if_eq}}
@@ -65,7 +65,11 @@ const chatTemplate:string = `
 {{#messages}}
     <article class="message-block {{#if_eq user_id ../currentUserId}}right{{else}}left{{/if_eq}}">
         <div class="message-item">
-            <b class="message-title">{{title}}</b>
+            <b class="message-title">
+            {{#user}}
+                {{first_name}} {{second_name}}
+            {{/user}}
+            </b>
         {{#if_eq type 'file'}}
             <div class="message-images">
             {{#file}}
@@ -89,7 +93,7 @@ const chatTemplate:string = `
     <form id="message-form" class="inline" {{on 'submit' 'sendMessage'}}>
         <textarea {{on 'input' 'onInput'}} name="message" placeholder="Сообщение">{{message}}</textarea>
         <label class="image-files">
-            &equiv;
+            &plusb;
             <input id="file-images" {{on 'change' 'addFile'}} name="images" type="file" multiple accept="image/*"/>
         </label>
         <input type="submit" disabled value="Отправить"/>
@@ -124,25 +128,26 @@ export default class Chat extends Component {
                         showSettings: false,
                         archive
                     }));
-                    api.chats.$token(this.chatId).then((r)=>{
-                        if(this.$currentUser===null) return;
+                    api.chats.$token(this.chatId).then((r:Obj) => {
+                        if (this.$currentUser === null) return;
                         this.data.currentUserId = this.$currentUser.id;
                         this.socket = new Socket(this.$currentUser.id,this.chatId,r.token);
-                        this.socket.addEventListener("open",()=>{
-                            this.socket.$getMessages(0).then((res)=>{
-                                this.data.messages = res;
-                                console.log(this.data.messages)
-                            }).catch(console.error)
+                        this.socket.addEventListener('open',() => {
+                            this.socket?.$onMessage((res:Obj) => {
+                                api.users.$get(res.user_id).then((user:UserType) => {
+                                    this.data.messages.push({ ...res,user })
+                                })
+                            })
+                            this.socket?.$getMessages(0);
                         })
                     })
                 }
             }
         });
         this.$addHelper('msgTime', (time:string) => {
-            let msgDate = new Date(time);
-            let today = new Date()
-            if(today.toDateString() === msgDate.toDateString())
-                return msgDate.toLocaleTimeString()
+            const msgDate = new Date(time);
+            const today = new Date()
+            if (today.toDateString() === msgDate.toDateString()) { return msgDate.toLocaleTimeString() }
             return msgDate.toLocaleString();
         });
         this.profileInfoModal = new Modal({
@@ -152,51 +157,43 @@ export default class Chat extends Component {
                 fields: [],
                 ok_title: 'Сохранить',
                 cancel_title: 'Отмена'
-            },
-            events: {
-                open: () => {
-                    this.profileInfoModal.data.fields = [];
-                    setTimeout(() => {
-                        this.profileInfoModal.data.fields = [
-                            { label: 'Аватар', type: 'avatar', name: 'avatar', value: this.data.avatar },
-                            { label: 'Имя', type: 'text', name: 'first_name', value: this.data.first_name },
-                            { label: 'Фамилия', type: 'text', name: 'second_name', value: this.data.second_name },
-                            { label: 'Email', type: 'email', name: 'email', value: this.data.email },
-                            { label: 'Телефон', type: 'tel', name: 'phone', value: this.data.phone }
-                        ]
-                    },500)
-                }
             }
         });
     }
 
-    private messages: Obj[] = [];
     private message: string = '';
     private chatId: number = 0;
-    private socket: Socket;
+    private socket: Socket | undefined;
     private profileInfoModal: Modal;
     // @ts-ignore - used after template compilation from element events
-    private openProfileInfo () {
-        this.profileInfoModal.$open();
+    private openProfileInfo (event:Event,id:number) {
+        api.users.$get(id).then((res:UserType) => {
+            this.profileInfoModal.data.fields = [
+                { label: 'Аватар', type: 'avatar', name: 'avatar', value: res.avatar },
+                { label: 'Имя', type: 'text', name: 'first_name', value: res.first_name },
+                { label: 'Фамилия', type: 'text', name: 'second_name', value: res.second_name },
+                { label: 'Email', type: 'email', name: 'email', value: res.email },
+                { label: 'Телефон', type: 'tel', name: 'phone', value: res.phone }
+            ]
+            this.profileInfoModal.$attach()
+        })
     }
 
     // @ts-ignore - used after template compilation from element events
     private sendMessage (event:Event) {
         event.preventDefault();
         const form = <HTMLFormElement>event.target;
-        this.socket.$sendMessage(form.message.value).then((res)=>{
-            this.data.messages.push(res);
-        }).catch(console.error)
+        this.socket?.$sendMessage(form.message.value);
+        this.$emit('update-chat-list');
     }
 
     // @ts-ignore - used after template compilation from element events
     private addFile (event:Event) {
-        let files = (<HTMLInputElement>event.target).files;
-        if(files===null) return;
-        api.resources.$add(files[0]).then((r:Obj)=>{
-            this.socket.$sendImage(r.id).then((res)=>{
-                this.data.messages.push(res);
-            })
+        const files = (<HTMLInputElement>event.target).files;
+        if (files === null) return;
+        api.resources.$add(files[0]).then((r:Obj) => {
+            this.socket?.$sendImage(r.id)
+            this.$emit('update-chat-list');
         })
     }
 
@@ -266,7 +263,7 @@ export default class Chat extends Component {
     private includeUser (event:Event,userId:number) {
         event.preventDefault();
         api.chats.$includeUser(this.chatId,[userId]).then(() => {
-            this.data.userSearch = this.data.userSearch.filter(u => u.id !== userId)
+            this.data.userSearch = this.data.userSearch.filter((u:UserType) => u.id !== userId)
             api.chats.$users(this.chatId).then((res:Obj[]) => {
                 this.data.users = res;
             })

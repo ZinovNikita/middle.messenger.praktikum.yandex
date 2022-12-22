@@ -11,7 +11,7 @@ const modalTemplate:string = `
         {{#if_eq type 'avatar'}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label class="avatar-image">
-                <img src="{{value}}"/>
+                <img src="{{resourceUrl value}}"/>
             </label>
         </fieldset>
         {{else}}
@@ -26,7 +26,7 @@ const modalTemplate:string = `
             <label>{{label}}</label>
             <label class="avatar-image">
                 <input type="file" accept="image/*" name="{{name}}" {{on 'change' 'onSelectAvatar'}}/>
-                <img src="{{value}}"/>
+                <img src="{{resourceUrl value}}"/>
             </label>
             <small class="error-msg"></small>
         </fieldset>

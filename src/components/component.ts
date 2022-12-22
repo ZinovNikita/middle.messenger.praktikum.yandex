@@ -107,6 +107,7 @@ export default class Component<T extends ComponentOptionsType = {}> {
     public get $uid ():string {
         return this.uid;
     }
+
     public get $currentUser ():UserType|null {
         if (this.$store.$has('user')) { return this.$store.$get('user') }
         return null
