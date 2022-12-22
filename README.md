@@ -13,6 +13,7 @@
 ## Страницы проекта на Netlify
 - [Авторизация](https://elaborate-paprenjak-e0ca12.netlify.app/) — Вход для существующих пользователей
 - [Регистрация](https://elaborate-paprenjak-e0ca12.netlify.app/sign-up) — Регистрация новых пользователей
-- [Список чатов](https://elaborate-paprenjak-e0ca12.netlify.app/messenger) — отображается список чатов и в каждом из них список сообщений
+- [Список чатов](https://elaborate-paprenjak-e0ca12.netlify.app/messenger) — Отображается список чатов и в каждом из них список сообщений
 - [404 Ошибка](https://elaborate-paprenjak-e0ca12.netlify.app/404) — Ошибка 404
 - [5** Ошибка](https://elaborate-paprenjak-e0ca12.netlify.app/500) — Ошибка 5**
+- Чтобы выйти из приложения, необходмио нажать на крестик &#8855; около Фото профиля
