@@ -19,6 +19,11 @@ export default <ViewConstructor> class SignIn extends Modal {
                 },
                 cancel: () => {
                     this.$router.$go('/sign-up')
+                },
+                done: (result:boolean) => {
+                    if (result === true) {
+                        this.$router.$go('/messenger')
+                    }
                 }
             },
             methods: {
