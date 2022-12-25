@@ -88,7 +88,7 @@ export default <ViewConstructor> class SignUp extends Modal {
                                 this.$field_error(k, msg);
                             }
                             if (success === true) {
-                                api.auth.$signUp(this.fvalues as SignUpParams).then(res => {
+                                api.auth.$signUp(this.fvalues as SignUpParams).then(() => {
                                     resolve(success);
                                 }).catch(() => {
                                     resolve(false)

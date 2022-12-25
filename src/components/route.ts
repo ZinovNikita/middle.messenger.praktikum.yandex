@@ -35,7 +35,7 @@ export default class Route {
     $render () {
         if (!this.page) {
             const Cls:ViewConstructor = this.pageClass;
-            if (this.props === undefined) { this.props = {} }
+            if (!this.props) { this.props = {} }
             this.page = new Cls(this.props);
         }
         this.page.$attach(this.rootElement);

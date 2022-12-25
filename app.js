@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
+const badIPs = [];
+const requestsCounts = {};
+const lastRequestTime = {};
 app.use(express.static('dist'));
-let badIPs = [];
-let requestsCounts = {};
-let lastRequestTime = {};
 app.use(function(req, res, next) {
     if(badIPs.indexOf(req.ip)>=0){
         res.status(403).send('IP Banned!');

@@ -23,9 +23,9 @@ export default class Socket extends WebSocket {
                     res.reverse().forEach((m:Obj) => {
                         callback(m)
                     });
-                } else if (res.type === 'user connected') {
-                    return
-                } else { callback(res) }
+                } else if (res.type !== 'user connected') {
+                    callback(res)
+                }
             }
         });
     }
