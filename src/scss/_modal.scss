@@ -2,7 +2,7 @@
 
 .modal {
     background-color: $sidebar-bg;
-    top: 10vh;
+    top: 6vh;
     border-radius: 5px;
     border: $default-border;
     padding: 10px;
@@ -30,6 +30,11 @@
             font-size: 20px;
             cursor: pointer;
         }
+    }
+
+    >.modal-body {
+        max-height: 70vh;
+        overflow: auto;
     }
 
     >.modal-footer {

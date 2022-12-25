@@ -6,8 +6,8 @@ import Store from '../components/store';
 const host = 'https://ya-praktikum.tech';
 const store = Store.Init();
 export default {
-    auth: Auth.Init(host,store),
-    users: Users.Init(host,store),
-    chats: Chats.Init(host,store),
-    resources: Resources.Init(host,store)
+    auth: Auth.Init(host,store) as Auth,
+    users: Users.Init(host,store) as Users,
+    chats: Chats.Init(host,store) as Chats,
+    resources: Resources.Init(host,store) as Resources
 }

@@ -77,7 +77,7 @@ export default class Sidebar extends Component {
                 }
             },
             methods: {
-                validator (key:string|undefined) {
+                validator (this:Modal,key:string|undefined) {
                     const checkFields = (name:string,value:string):string => {
                         if (name === 'first_name' || name === 'second_name') {
                             if (!value ||
@@ -122,7 +122,7 @@ export default class Sidebar extends Component {
                                 this.$field_error(k,msg)
                             }
                             if (success) {
-                                api.users.$profile(this.fvalues).then(() => { resolve(true) }).catch(() => { resolve(false) })
+                                api.users.$profile(this.fvalues as UserType).then(() => { resolve(true) }).catch(() => { resolve(false) })
                             } else { resolve(success); }
                         }
                     })
@@ -230,7 +230,7 @@ export default class Sidebar extends Component {
     // @ts-ignore - used after template compilation from element events
     private createNewChat () {
         let title;
-        while (title === null || title === undefined || title === '') { title = prompt('Укажите название чата'); }
+        while (!title) { title = prompt('Укажите название чата'); }
         api.chats.$create(title).then(() => {
             this.data.chats = this.$store.$get('chat_list')
         })

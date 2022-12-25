@@ -5,7 +5,7 @@ const modalTemplate:string = `
     <h3>{{title}}</h3>
     <i class="modal-close" {{on 'click' 'onClose'}}>&times;</i>
 </header>
-<form id="{{uid}}-form" {{on 'focusin' 'onFocus'}} {{on 'focusout' 'onFocus'}} {{on 'blur' 'onFocus'}} {{on 'focus' 'onFocus'}}>
+<form class="modal-body" {{on 'focusin' 'onFocus'}} {{on 'focusout' 'onFocus'}} {{on 'blur' 'onFocus'}} {{on 'focus' 'onFocus'}}>
 {{#fields}}
     {{#if ../readonly}}
         {{#if_eq type 'avatar'}}

@@ -133,6 +133,10 @@ export default class Chat extends Component {
                         this.socket = new Socket(this.$currentUser.id,this.chatId,r.token);
                         this.socket.addEventListener('open',() => {
                             this.socket?.$onMessage((res:Obj) => {
+                                this.$emit('update-chat-list');
+                                if (res.chat_id !== undefined && res.chat_id !== this.chatId) {
+                                    return
+                                }
                                 api.users.$get(res.user_id).then((user:UserType) => {
                                     this.data.messages.push({ ...res,user })
                                 })
@@ -229,7 +233,7 @@ export default class Chat extends Component {
     private changeAvatar (event:Event,chatId:number) {
         const tg:HTMLInputElement = <HTMLInputElement>event.target
         if (!tg || !tg.files) return
-        api.chats.$avatar(chatId, tg.files[0]).then((chat:Obj) => {
+        api.chats.$avatar(`${chatId}`, tg.files[0]).then((chat:Obj) => {
             Object.assign(this.data, chat);
             this.$emit('update-chat-list');
         })

@@ -21,6 +21,9 @@ export default <ViewConstructor> class Messenger extends Component {
                 this.sidebar.$emit('load-chat-list')
             }
         });
+        setInterval(() => {
+            this.sidebar.$emit('load-chat-list')
+        },10000)
     }
 
     private sidebar:ComponentType;

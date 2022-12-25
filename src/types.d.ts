@@ -53,21 +53,6 @@ declare type ComponentType = {
     $currentUser: UserType|null,
 }
 declare type ObjComponentType = {[id:string]:ComponentType}
-declare type Fetch2OptionsType = {
-    method?: string,
-    timeout?: number,
-    headers?: Obj,
-    params?: Obj,
-    body?: Document|XMLHttpRequestBodyInit|undefined,
-}
-declare type Fetch2MethodType = (url:string, options:Fetch2OptionsType) => Promise<unknown>
-declare type Fetch2Type = {
-    $get: Fetch2MethodType,
-    $post: Fetch2MethodType,
-    $put: Fetch2MethodType,
-    $delete: Fetch2MethodType,
-    $request: Fetch2MethodType,
-}
 declare type EventBus = {
     $on: Function,
     $off: Function,
