@@ -7,9 +7,9 @@ $default-border: 1px solid #848484;
 $input-bg: #222529;
 $placeholder-color: #ddd;
 
-@import "reset";
-@import "error";
-@import "modal";
+@import "./_reset.scss";
+@import "./_error.scss";
+@import "./_modal.scss";
 
 /* Стиль основной страницы */
 
