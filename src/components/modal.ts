@@ -1,17 +1,17 @@
 import Component from './component';
+import api from '../api';
 const modalTemplate:string = `
 <header class="modal-title">
     <h3>{{title}}</h3>
-    <i id="{{uid}}-close" class="modal-close"
-        {{on 'click' 'onClose' 'i.modal-close'}}>&times;</i>
+    <i class="modal-close" {{on 'click' 'onClose'}}>&times;</i>
 </header>
-<form id="{{uid}}-form" data-obj-type="modal-form" {{on 'focusin' 'onFocus'}} {{on 'focusout' 'onFocus'}} {{on 'blur' 'onFocus'}} {{on 'focus' 'onFocus'}}>
+<form class="modal-body" {{on 'focusin' 'onFocus'}} {{on 'focusout' 'onFocus'}} {{on 'blur' 'onFocus'}} {{on 'focus' 'onFocus'}}>
 {{#fields}}
     {{#if ../readonly}}
         {{#if_eq type 'avatar'}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label class="avatar-image">
-                <img data-obj-type="image" src="{{value}}"/>
+                <img src="{{resourceUrl value}}"/>
             </label>
         </fieldset>
         {{else}}
@@ -25,16 +25,15 @@ const modalTemplate:string = `
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
             <label class="avatar-image">
-                <input data-obj-type="file-avatar" type="file" accept="image/*" name="{{name}}"
-                    {{on 'change' 'onSelectAvatar'}}/>
-                <img data-obj-type="image" src="{{value}}"/>
+                <input type="file" accept="image/*" name="{{name}}" {{on 'change' 'onSelectAvatar'}}/>
+                <img src="{{resourceUrl value}}"/>
             </label>
             <small class="error-msg"></small>
         </fieldset>
         {{else}}
         <fieldset id="{{../uid}}-fieldset-{{name}}">
             <label>{{label}}</label>
-            <input data-obj-type="field" type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"/>
+            <input type="{{type}}" name="{{name}}" placeholder="{{label}}" value="{{value}}"/>
             <small class="error-msg"></small>
         </fieldset>
         {{/if_eq}}
@@ -43,26 +42,35 @@ const modalTemplate:string = `
 </form>
 {{#if_eq readonly false}}
 <footer class="modal-footer">
-    <button id="{{uid}}-cancel" class="btn-red" data-obj-type="cancel-btn" {{on 'click' 'onCancel'}}>{{cancel_title}}</button>
-    <button id="{{uid}}-ok" data-obj-type="ok-btn" {{on 'click' 'onOk'}}>{{ok_title}}</button>
+{{#buttons}}
+    <button class="{{class}}" {{on 'click' 'onButton'}} event="{{event}}">{{title}}</button>
+{{/buttons}}
+    <button class="btn-red" {{on 'click' 'onCancel'}}>{{cancel_title}}</button>
+    <button {{on 'click' 'onOk'}}>{{ok_title}}</button>
 </footer>
 {{/if_eq}}`;
 export default class Modal extends Component {
     constructor (options:ComponentOptionsType) {
-        if (!options.events) { options.events = {}; }
-        options.events['html-update'] = () => {
-            (<Obj[]> this.data.fields).forEach((f:Obj) => {
-                this.fvalues[f.name as keyof Obj] = f.value;
-            })
-            this.$emit('mounted');
-        }
+        options.events = Object.assign({},options.events)
+        options.events = Object.assign(options.events,{
+            'html-update': () => {
+                (<Obj[]> this.data.fields).forEach((f:Obj) => {
+                    this.fvalues[f.name as keyof Obj] = f.value;
+                })
+                this.$emit('mounted');
+            },
+            attach: () => {
+                if (!(<HTMLDialogElement> this.$el).open) { (<HTMLDialogElement> this.$el).showModal(); }
+                this.$emit('open');
+            }
+        });
         super(modalTemplate,'dialog', options);
         (<HTMLDialogElement> this.$el).close();
         this.props.className = 'modal';
         this.$emit('html-update');
     }
 
-    private fvalues: Obj = {};
+    public fvalues: Obj = {};
 
     // @ts-ignore - used after template compilation from element events
     private onFocus (event:any) {
@@ -75,6 +83,11 @@ export default class Modal extends Component {
     private onCancel () {
         this.$emit('cancel');
         this.$close(false)
+    }
+
+    // @ts-ignore - used after template compilation from element events
+    private onButton (event:any) {
+        this.$emit(event.target.getAttribute('event'));
     }
 
     // @ts-ignore - used after template compilation from element events
@@ -95,7 +108,12 @@ export default class Modal extends Component {
 
     // @ts-ignore - used after template compilation from element events
     private onSelectAvatar (event:any) {
-        this.$emit('select-avatar',event.target.files)
+        api.users.$avatar(event.target.files[0]).then((url:string) => {
+            this.$find(`#${this.$uid}-fieldset-avatar img`)?.setAttribute('src',url);
+            this.fvalues.avatar = url;
+            this.$emit('input','avatar',url);
+            this.$emit('select-avatar')
+        });
     }
 
     public $field_error (key:string,msg:string = '') {
@@ -104,18 +122,26 @@ export default class Modal extends Component {
     }
 
     public $is_valid (key:string|undefined = undefined):Promise<boolean> {
+        if (key === undefined) {
+            for (const k in this.fvalues) {
+                const tmp:any = this.$find(`*[name="${k}"]`);
+                if (tmp !== null) {
+                    this.fvalues[tmp.name] = tmp.value;
+                    this.$emit('input',tmp.name,tmp.value);
+                }
+            }
+        }
         if (typeof this.methods.validator === 'function') { return this.methods.validator.call(this,key); } else {
             return new Promise((resolve:Function) => {
-                for (const k in this.fvalues) { this.$field_error(k) }
+                for (const k in this.fvalues) { this.$field_error(k); }
                 resolve({ success: true });
             })
         }
     }
 
-    public $open () {
-        this.$attach(document.body);
-        (<HTMLDialogElement> this.$el).showModal();
-        this.$emit('open');
+    public $attach () {
+        document.body.appendChild(this.$el);
+        this.$emit('attach');
     }
 
     public $close (result:boolean = false) {

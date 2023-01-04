@@ -55,6 +55,14 @@ input[type="reset"],
     background-color: red;
 }
 
+.btn-dark {
+    background-color: $main-bg;
+}
+
+.btn-circle {
+    border-radius: 50%;
+}
+
 button,
 input[type="submit"],
 input[type="button"],
