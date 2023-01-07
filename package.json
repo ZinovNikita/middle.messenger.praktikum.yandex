@@ -13,8 +13,7 @@
         "build": "webpack build",
         "lint": "eslint \"src/**/*.ts\" && stylelint \"src/**/*.scss\"",
         "lint-fix": "eslint \"src/**/*.ts\" --fix && stylelint \"src/**/*.scss\" --fix",
-        "start": "npm run build && node ./app.js",
-        "docker-start": "docker build . -t messenger && docker run -p 3000:3000 -d messenger && docker ps",
+        "start": "docker build . -t messenger && docker run -p 3000:3000 -d messenger && docker ps",
         "test": "mocha"
     },
     "repository": {
