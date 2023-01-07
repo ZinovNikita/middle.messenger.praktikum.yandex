@@ -25,7 +25,7 @@ describe('Fetch2',() => {
         const res = await fetch2.$put('/test4', {
             headers: {
                 key1: 'val1',
-                key2: 'val2'}
+                key2: 'val2' }
         });
         expect((res as any).result).to.eq('done')
     })
