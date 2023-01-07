@@ -7,8 +7,7 @@ describe('Fetch2',() => {
     })
     it('post',async () => {
         const res = await fetch2.$post('/test2',{
-            params: {
-                par1: 1,                par2: 'text'}
+            params: { par1: 1, par2: 'text' }
         });
         expect((res as any).result).to.eq('done')
     })
@@ -23,7 +22,8 @@ describe('Fetch2',() => {
         const res = await fetch2.$put('/test4', {
             headers: {
                 key1: 'val1',
-                key2: 'val2' }
+                key2: 'val2'
+            }
         });
         expect((res as any).result).to.eq('done')
     })

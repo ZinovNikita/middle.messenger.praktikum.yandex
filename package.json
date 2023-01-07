@@ -17,12 +17,6 @@
         "docker-start": "docker build . -t messenger && docker run -p 3000:3000 -d messenger && docker ps",
         "test": "mocha"
     },
-    "husky": {
-        "hooks": {
-            "pre-commit": "npm run lint",
-            "pre-push": "npm run lint"
-        }
-    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/ZinovNikita/middle.messenger.praktikum.yandex.git"
