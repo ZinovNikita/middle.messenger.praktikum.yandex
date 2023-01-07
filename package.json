@@ -12,9 +12,9 @@
         "dev": "webpack serve",
         "build": "webpack build",
         "lint": "eslint \"src/**/*.ts\" && stylelint \"src/**/*.scss\"",
+        "test": "mocha",
         "lint-fix": "eslint \"src/**/*.ts\" --fix && stylelint \"src/**/*.scss\" --fix",
-        "start": "docker build . -t messenger && docker run -p 3000:3000 -d messenger && docker ps",
-        "test": "mocha"
+        "start": "docker build . -t messenger && docker run -p 3000:3000 -d messenger && docker ps"
     },
     "repository": {
         "type": "git",
@@ -46,7 +46,6 @@
         "husky": "8.0.3",
         "jsdom": "20.0.3",
         "mocha": "10.2.0",
-        "parcel": "2.8.0",
         "postcss-scss": "4.0.5",
         "process": "0.11.10",
         "sass-loader": "13.2.0",
