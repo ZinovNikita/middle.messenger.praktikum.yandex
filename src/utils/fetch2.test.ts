@@ -8,8 +8,7 @@ describe('Fetch2',() => {
     it('post',async () => {
         const res = await fetch2.$post('/test2',{
             params: {
-                par1: 1,
-                par2: 'text'}
+                par1: 1,                par2: 'text'}
         });
         expect((res as any).result).to.eq('done')
     })
