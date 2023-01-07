@@ -7,13 +7,21 @@
     },
     "browserslist": "> 0.5%, last 2 versions, not dead",
     "description": "---",
+    "type": "module",
     "scripts": {
         "dev": "webpack serve",
         "build": "webpack build",
         "lint": "eslint \"src/**/*.ts\" && stylelint \"src/**/*.scss\"",
         "lint-fix": "eslint \"src/**/*.ts\" --fix && stylelint \"src/**/*.scss\" --fix",
         "start": "npm run build && node ./app.js",
-        "docker-start": "docker build . -t messenger && docker run -p 3000:3000 -d messenger && docker ps"
+        "docker-start": "docker build . -t messenger && docker run -p 3000:3000 -d messenger && docker ps",
+        "test": "mocha"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm run lint && npm run test",
+            "pre-push": "npm run lint && npm run test"
+        }
     },
     "repository": {
         "type": "git",
@@ -26,9 +34,7 @@
     },
     "homepage": "https://github.com/ZinovNikita/middle.messenger.praktikum.yandex#readme",
     "dependencies": {
-        "css-loader": "^6.7.3",
-        "express": "4.18.2",
-        "style-loader": "^3.3.1"
+        "express": "4.18.2"
     },
     "devDependencies": {
         "@parcel/transformer-sass": "2.8.0",
@@ -43,19 +49,24 @@
         "eslint-config-standard": "17.0.0",
         "events": "3.3.0",
         "handlebars": "4.7.7",
-        "html-webpack-plugin": "^5.5.0",
+        "html-webpack-plugin": "5.5.0",
+        "husky": "8.0.3",
+        "jsdom": "20.0.3",
         "mocha": "10.2.0",
         "parcel": "2.8.0",
         "postcss-scss": "4.0.5",
         "process": "0.11.10",
-        "sass-loader": "^13.2.0",
+        "sass-loader": "13.2.0",
         "stylelint": "14.15.0",
         "stylelint-config-standard": "29.0.0",
         "stylelint-scss": "4.3.0",
-        "ts-loader": "^9.4.2",
+        "ts-loader": "9.4.2",
+        "ts-node": "10.9.1",
         "typescript": "4.9.3",
-        "webpack": "^5.75.0",
-        "webpack-cli": "^5.0.1",
-        "webpack-dev-server": "^4.11.1"
+        "webpack": "5.75.0",
+        "webpack-cli": "5.0.1",
+        "webpack-dev-server": "4.11.1",
+        "css-loader": "^6.7.3",
+        "style-loader": "3.3.1"
     }
 }

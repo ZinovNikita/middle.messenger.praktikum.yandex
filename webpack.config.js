@@ -1,8 +1,8 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const fs = require('fs');
-
-module.exports = {
+import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import fs from 'fs';
+const __dirname = path.resolve();
+export default {
   mode: 'development',
   entry: path.resolve(__dirname, 'src/app.ts'),
   devServer: {
@@ -62,4 +62,4 @@ module.exports = {
       filename: 'index.html',
     }),
   ]
-};
+}

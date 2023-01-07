@@ -1,4 +1,4 @@
-import "./scss/main.scss"
+import './scss/main.scss'
 import MessengerPage from './views/messenger';
 import ErrorPage from './views/error';
 import SignUpPage from './views/sign_up';
