@@ -42,8 +42,8 @@ export default {
                 type: 'asset/resource',
             },
             {
-                    test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
-                    type: 'asset/inline',
+                test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
+                type: 'asset/inline',
             },
         ]
     },
