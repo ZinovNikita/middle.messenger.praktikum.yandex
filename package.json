@@ -9,8 +9,8 @@
     "description": "---",
     "type": "module",
     "scripts": {
-        "dev": "webpack serve",
-        "build": "webpack build",
+        "dev": "webpack serve --config webpack.dev.js",
+        "build": "webpack build --config webpack.prod.js",
         "lint": "eslint \"src/**/*.ts\" && stylelint \"src/**/*.scss\"",
         "test": "mocha",
         "lint-fix": "eslint \"src/**/*.ts\" --fix && stylelint \"src/**/*.scss\" --fix",
